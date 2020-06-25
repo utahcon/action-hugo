@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+ls -Al
+
 ARGUMENTS=""
 
 # Handle Arguments
@@ -37,10 +39,11 @@ while (( "$#" )); do
   shift
 done
 
+MAIN=$(pwd)
+
 (
   if [ -n "${GITHUB_ACTIONS}" ]; then
     cd "${GITHUG_WORKSPACE}";
   fi;
-  echo "\"hugo ${ARGUMENTS}\""
-  ../hugo "${ARGUMENTS}"
+  ${HERE}/hugo "${ARGUMENTS}"
 )

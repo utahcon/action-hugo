@@ -1,6 +1,10 @@
 name: Hugo Builder
 
-on: push
+on:
+  push:
+    branch:
+      - master
+      - main
 
 jobs:
   push_to_registry:
