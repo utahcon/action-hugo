@@ -7,4 +7,4 @@ COPY hugo/hugo hugo
 COPY entrypoint.sh entrypoint.sh
 
 # Mark our enrtypoint
-ENTRYPOINT entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
