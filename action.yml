@@ -45,9 +45,9 @@ inputs:
     description: filesystem path to layout directory
     required: false
   minify:
-    description: minify any supported output format (HTML, XML etc.)
+    description: (ignored) minify any supported output format (HTML, XML etc.)
     required: false
-    default: true
+    default: false
   noChmod:
     description: don't sync permission mode of files
     required: false
