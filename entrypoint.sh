@@ -38,8 +38,6 @@ while (( "$#" )); do
 done
 
 (
-  if [ -n "${GITHUB_ACTIONS}" ]; then
-    cd "${GITHUB_WORKSPACE}";
-  fi;
-  /hugo "${ARGUMENTS}"
+  cd "${GITHUB_WORKSPACE}" || exit 1;
+  /hugo --cleanDestinationDir "${ARGUMENTS}";
 )
