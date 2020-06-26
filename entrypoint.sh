@@ -41,5 +41,5 @@ done
   if [ -n "${GITHUB_ACTIONS}" ]; then
     cd "${GITHUG_WORKSPACE}";
   fi;
-  /hugo "${ARGUMENTS}"
+  /hugo --cleanDestinationDir=true "${ARGUMENTS}"
 )

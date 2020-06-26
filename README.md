@@ -1,3 +1,3 @@
-# Utahcon Hugo
+# Utahcon Hugo Action
 
 Initial test
