@@ -1,9 +1,11 @@
 name: Hugo
 description: Build your Hugo application for deployment
 author: utahcon
+
 branding:
   icon: package
   color: orange
+
 inputs:
   version:
     description: Version of Hugo to use
@@ -83,7 +85,7 @@ inputs:
 
 runs:
   using: docker
-  image: docker://utahcon/hugo@${{inputs.version}}
+  image: docker://utahcon/hugo@%%version%%
   args:
     - ${{ inputs.baseURL }}
     - ${{ inputs.buildDrafts }}

@@ -7,17 +7,21 @@ on:
       - main
 
 jobs:
-  push_to_registry:
-    name: Push Docker image to Docker Hub
+  checkout_and_build:
+    name: Pull and Build Repo
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.install_hugo.outputs.version }}
     steps:
-      - name: Check out the repo
+      - id: check_out_the_repo
+        name: Check out the repo
         uses: actions/checkout@v2.3.1
         with:
           submodules: true # Fetch Hugo
           fetch-depth: 0   # Fetch all history for .GitInfo and Lastmod
 
-      - name: Install Hugo
+      - id: install_hugo
+        name: Install Hugo
         run: |
           cd hugo
           latest=$(git tag | sort -rV | head -n 1)
@@ -25,14 +29,22 @@ jobs:
           go install --tags extended
           cp $HOME/go/bin/hugo .
           ./hugo version
+          cd ..
+          sed -i "s/%%version%%/${latest}/" action.yml
+          git tag -af ${latest}
+          git push --all --follow --tags
+          echo "::set-output name=version::${latest}"
 
+  push_to_docker:
+    name: Push Docker image to Docker Hub
+    runs-on:  ubuntu-latest
+    needs: checkout_and_build
+    steps:
       - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v1.1.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
           repository: utahcon/hugo
-          tag_with_ref: true
-          tag_with_sha: true
           dockerfile: Containerfile
-          tags: latest
+          tags: latest, ${{ needs.checkout_and_build.outputs.version }}
