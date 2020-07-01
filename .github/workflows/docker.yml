@@ -65,7 +65,7 @@ jobs:
 
       - id: download_hugo_artifact
         name: Download Hugo artifact
-        users: actions/download-artifact@v1
+        uses: actions/download-artifact@v1
         with:
           name: hugo
 
