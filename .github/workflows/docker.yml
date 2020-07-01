@@ -42,10 +42,6 @@ jobs:
         name: Create action.yml
         run: |
           sed "s/%%version%%/${{ steps.install_hugo.outputs.version }}/" action.yml.tmp > action.yml
-
-      - id: commit_action
-        name: Commit new action.yml
-        run: |
           git add action.yml
           git commit -m "Updating action.yml with version ${{ steps.install_hugo.outputs.version }}"
 
