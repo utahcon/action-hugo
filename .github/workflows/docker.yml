@@ -24,7 +24,6 @@ jobs:
         name: Install Hugo
         run: |
           LATEST=$(
-            cd hugo || exit 1
             LATEST=$(git tag | sort -rV | head -n 1)
             git checkout $LATEST >&2
             go install --tags extended >&2
