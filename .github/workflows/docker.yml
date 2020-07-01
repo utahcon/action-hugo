@@ -4,7 +4,6 @@ on:
   push:
     branch:
       - master
-      - main
 
 jobs:
   checkout_and_build:
@@ -32,21 +31,26 @@ jobs:
             echo "${LATEST}"
           )
           echo "Installed version: ${LATEST}" >&2
+          echo "::set-output name=version::${LATEST}"
 
+      - id: create_action_yml
+        name: Create action.yml
+        run: |
           echo "Creating action.yml" >&2
-          sed "s/%%version%%/${LATEST}/" action.yml.tmp > action.yml
-
+          sed "s/%%version%%/${{ steps.install_hugo.version }}/" action.yml.tmp > action.yml
           echo "Commit new action.yml" >&2
-          git config user.email "github@utahcon.com"
-          git config user.name "Github Gitbot"
           git add action.yml
           git commit -m "Updating action.yml with version ${LATEST}"
-          git push origin :refs/tags/${LATEST}
-          git push origni :refs/tags/latest
-          git tag -af ${LATEST} -m "Version ${LATEST}"
-          git tag -af latest -m "Version ${LATEST}"
-          git push --tags
-          echo "::set-output name=version::${LATEST}"
+
+      - id: create_new_version_branch
+        name: Create new version branch
+        run: |
+          git checkout -b ${{ steps.install_hugo.version }}
+          git config user.email "github@utahcon.com"
+          git config user.name "Utahcon"
+          git push origin :refs/tags/latest
+          git tag -af latest -m "Version ${{ steps.install_hugo.version }}"
+          git push  origin ${{ steps.install_hugo.version }} --tags
 
       - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v1.1.0
