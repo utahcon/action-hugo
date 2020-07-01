@@ -33,7 +33,7 @@ jobs:
           sed -i "s/%%version%%/${latest}/" action.yml
           git config user.email "github@utahcon.com"
           git config user.name "Github Gitbot"
-          git tag -af ${latest}
+          git tag -af ${latest} -m "Version ${latest}"
           git push --all --follow --tags
           echo "::set-output name=version::${latest}"
 
