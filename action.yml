@@ -85,7 +85,7 @@ inputs:
 
 runs:
   using: docker
-  image: docker://utahcon/hugo@%%version%%
+  image: docker://utahcon/hugo@v0.73.0
   args:
     - ${{ inputs.baseURL }}
     - ${{ inputs.buildDrafts }}
