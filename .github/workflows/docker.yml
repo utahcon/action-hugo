@@ -65,9 +65,10 @@ jobs:
       - id: create_new_version_branch
         name: Create new version branch
         run: |
+          git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version  }}
+          git push origin :${{ needs.checkout_and_build_hugo.outputs.version  }}
           git checkout -b ${{ needs.checkout_and_build_hugo.outputs.version  }}
           git push origin :refs/tags/latest
-          git push origin :${{ needs.checkout_and_build_hugo.outputs.version  }}
           git tag -af latest -m "Version ${{ needs.checkout_and_build_hugo.outputs.version  }}"
           git push origin ${{ needs.checkout_and_build_hugo.outputs.version }} --tags
 
