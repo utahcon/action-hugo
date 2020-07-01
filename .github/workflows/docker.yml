@@ -6,8 +6,8 @@ on:
       - master
 
 jobs:
-  checkout_and_build:
-    name: Pull and Build Repo
+  checkout_and_build_hugo:
+    name: Pull and Build Hugo
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.install_hugo.outputs.version }}
@@ -42,9 +42,9 @@ jobs:
           path: hugo
 
   checkout_and_build_container:
-    name: ID with Git
+    name: Pull and Build action-hugo
     runs-on: ubuntu-latest
-    needs: checkout_and_build
+    needs: checkout_and_build_hugo
     steps:
       - id: check_out_the_repo
         name: Check out the repo
@@ -59,23 +59,23 @@ jobs:
       - id: create_action_yml
         name: Create action.yml
         run: |
-          sed "s/%%version%%/${{ steps.install_hugo.outputs.version }}/" action.yml.tmp > action.yml
+          sed "s/%%version%%/${{ needs.checkout_and_build_hugo.outputs.version }}/" action.yml.tmp > action.yml
           git add action.yml
-          git commit -m "Updating action.yml with version ${{ steps.install_hugo.outputs.version }}"
+          git commit -m "Updating action.yml with version ${{ needs.checkout_and_build_hugo.outputs.version }}"
+
+      - id: create_new_version_branch
+        name: Create new version branch
+        run: |
+          git checkout -b ${{ needs.checkout_and_build_hugo.outputs.version  }}
+          git push origin :refs/tags/latest
+          git tag -af latest -m "Version ${{ needs.checkout_and_build_hugo.outputs.version  }}"
+          git push origin ${{ steps.install_hugo.version }} --tags
 
       - id: download_hugo_artifact
         name: Download Hugo artifact
         uses: actions/download-artifact@v1
         with:
           name: hugo
-
-      - id: create_new_version_branch
-        name: Create new version branch
-        run: |
-          git checkout -b ${{ steps.install_hugo.version }}
-          git push origin :refs/tags/latest
-          git tag -af latest -m "Version ${{ steps.install_hugo.outputs.version }}"
-          git push origin ${{ steps.install_hugo.version }} --tags
 
       - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v1.1.0
@@ -84,4 +84,4 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
           repository: utahcon/hugo
           dockerfile: Containerfile
-          tags: latest,${{ steps.install_hugo.outputs.version }}
+          tags: latest,${{ needs.checkout_and_build_hugo.outputs.version  }}
