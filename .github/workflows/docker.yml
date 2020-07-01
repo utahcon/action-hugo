@@ -41,20 +41,20 @@ jobs:
       - id: create_action_yml
         name: Create action.yml
         run: |
-          sed "s/%%version%%/${{ steps.install_hugo.version }}/" action.yml.tmp > action.yml
+          sed "s/%%version%%/${{ steps.install_hugo.outputs.version }}/" action.yml.tmp > action.yml
 
       - id: commit_action
         name: Commit new action.yml
         run: |
           git add action.yml
-          git commit -m "Updating action.yml with version ${LATEST}"
+          git commit -m "Updating action.yml with version ${{ steps.install_hugo.outputs.version }}"
 
       - id: create_new_version_branch
         name: Create new version branch
         run: |
           git checkout -b ${{ steps.install_hugo.version }}
           git push origin :refs/tags/latest
-          git tag -af latest -m "Version ${{ steps.install_hugo.version }}"
+          git tag -af latest -m "Version ${{ steps.install_hugo.outputs.version }}"
           git push origin ${{ steps.install_hugo.version }} --tags
 
       - name: Build and Push to Docker Hub
@@ -64,4 +64,4 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
           repository: utahcon/hugo
           dockerfile: Containerfile
-          tags: latest,${{ steps.install_hugo.version }}
+          tags: latest,${{ steps.install_hugo.outputs.version }}
