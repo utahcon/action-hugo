@@ -34,7 +34,7 @@ jobs:
           git config user.email "github@utahcon.com"
           git config user.name "Github Gitbot"
           git tag -af ${latest} -m "Version ${latest}"
-          git push --all --follow --tags
+          git push --all
           echo "::set-output name=version::${latest}"
 
   push_to_docker:
