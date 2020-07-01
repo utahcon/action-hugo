@@ -58,7 +58,10 @@ jobs:
       - id: create_action_yml
         name: Create action.yml
         run: |
+          ls -Al
           sed "s/%%version%%/${{ needs.checkout_and_build_hugo.outputs.version }}/" action.yml.tmp > action.yml
+          ls -Al
+          git status
           git add action.yml
           git commit -m "Updating action.yml with version ${{ needs.checkout_and_build_hugo.outputs.version }}"
 
