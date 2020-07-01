@@ -20,25 +20,32 @@ jobs:
       - id: install_hugo
         name: Install Hugo
         run: |
-          echo "Installing Hugo" >&2
           LATEST=$(
-            cd hugo
+            cd hugo || exit 1
             LATEST=$(git tag | sort -rV | head -n 1)
-            git checkout $LATEST
-            go install --tags extended
+            git checkout $LATEST >&2
+            go install --tags extended >&2
             mv $HOME/go/bin/hugo .
             ./hugo version >&2
             echo "${LATEST}"
           )
-          echo "Installed version: ${LATEST}" >&2
+          echo "Installed version: ${LATEST}"
           echo "::set-output name=version::${LATEST}"
+
+      - id: identify
+        name: ID with Git
+        run: |
+          git config user.email "github@utahcon.com"
+          git config user.name "Utahcon"
 
       - id: create_action_yml
         name: Create action.yml
         run: |
-          echo "Creating action.yml" >&2
           sed "s/%%version%%/${{ steps.install_hugo.version }}/" action.yml.tmp > action.yml
-          echo "Commit new action.yml" >&2
+
+      - id: commit_action
+        name: Commit new action.yml
+        run: |
           git add action.yml
           git commit -m "Updating action.yml with version ${LATEST}"
 
@@ -46,11 +53,9 @@ jobs:
         name: Create new version branch
         run: |
           git checkout -b ${{ steps.install_hugo.version }}
-          git config user.email "github@utahcon.com"
-          git config user.name "Utahcon"
           git push origin :refs/tags/latest
           git tag -af latest -m "Version ${{ steps.install_hugo.version }}"
-          git push  origin ${{ steps.install_hugo.version }} --tags
+          git push origin ${{ steps.install_hugo.version }} --tags
 
       - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v1.1.0
