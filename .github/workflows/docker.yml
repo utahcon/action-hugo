@@ -65,11 +65,29 @@ jobs:
       - id: create_new_version_branch
         name: Create new version branch
         run: |
-          git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version  }}
-          git push origin :${{ needs.checkout_and_build_hugo.outputs.version  }}
+          echo "Cleaning branches"
+          for BRANCH in $(git branch -r); do
+            if [ $BRANCH == "origin/${{ needs.checkout_and_build_hugo.outputs.version  }}" ]; then
+              git branch -D ${{ needs.checkout_and_build_hugo.outputs.version  }}
+              git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version  }}
+              git push origin :${{ needs.checkout_and_build_hugo.outputs.version  }}
+            fi
+          done
+
+          echo "Creating branch: ${{ needs.checkout_and_build_hugo.outputs.version  }}"
           git checkout -b ${{ needs.checkout_and_build_hugo.outputs.version  }}
-          git push origin :refs/tags/latest
+
+          echo "Cleaning tags"
+          for TAG in $(git tag); do
+            if [ $TAG == "${{ needs.checkout_and_build_hugo.outputs.version  }}" ]; then
+              git push origin :refs/tags/latest
+            fi
+          done
+
+          echo "Moving git tag latest"
           git tag -af latest -m "Version ${{ needs.checkout_and_build_hugo.outputs.version  }}"
+
+          echo "Pushing branch and tags"
           git push origin ${{ needs.checkout_and_build_hugo.outputs.version }} --tags
 
       - id: download_hugo_artifact
