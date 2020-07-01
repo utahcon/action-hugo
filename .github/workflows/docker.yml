@@ -68,25 +68,25 @@ jobs:
           echo "Cleaning branches"
           for BRANCH in $(git branch -r); do
             if [ $BRANCH == "origin/${{ needs.checkout_and_build_hugo.outputs.version  }}" ]; then
-              git branch -D ${{ needs.checkout_and_build_hugo.outputs.version  }}
+              git branch -D ${{ needs.checkout_and_build_hugo.outputs.version }}
               git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version  }}
-              git push origin :${{ needs.checkout_and_build_hugo.outputs.version  }}
+              git push origin :${{ needs.checkout_and_build_hugo.outputs.version }}
             fi
           done
 
-          echo "Creating branch: ${{ needs.checkout_and_build_hugo.outputs.version  }}"
-          git checkout -b ${{ needs.checkout_and_build_hugo.outputs.version  }}
+          echo "Creating branch: ${{ needs.checkout_and_build_hugo.outputs.version }}"
+          git checkout -b ${{ needs.checkout_and_build_hugo.outputs.version }}
 
           echo "Cleaning tags"
           for TAG in $(git tag); do
-            if [ $TAG == "${{ needs.checkout_and_build_hugo.outputs.version  }}" ]; then
-              git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version  }}
+            if [ $TAG == "${{ needs.checkout_and_build_hugo.outputs.version }}" ]; then
+              git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version }}
             fi
           done
 
           echo "Moving git tag latest"
           git push origin :refs/tags/latest
-          git tag -af latest -m "Version ${{ needs.checkout_and_build_hugo.outputs.version  }}"
+          git tag -af latest -m "Version ${{ needs.checkout_and_build_hugo.outputs.version }}"
 
           echo "Pushing branch and tags"
           git push origin ${{ needs.checkout_and_build_hugo.outputs.version }} --tags
@@ -108,4 +108,4 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
           repository: utahcon/hugo
           dockerfile: Containerfile
-          tags: latest,${{ needs.checkout_and_build_hugo.outputs.version  }}
+          tags: latest,${{ needs.checkout_and_build_hugo.outputs.version }}
