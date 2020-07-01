@@ -52,6 +52,7 @@ jobs:
       - id: identify
         name: ID with Git
         run: |
+          git fetch --all
           git config user.email "github@utahcon.com"
           git config user.name "Utahcon"
 
