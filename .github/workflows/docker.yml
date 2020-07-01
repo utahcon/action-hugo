@@ -10,8 +10,6 @@ jobs:
   checkout_and_build:
     name: Pull and Build Repo
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.install_hugo.outputs.version }}
     steps:
       - id: check_out_the_repo
         name: Check out the repo
@@ -39,11 +37,6 @@ jobs:
           git push --all
           echo "::set-output name=version::${latest}"
 
-  push_to_docker:
-    name: Push Docker image to Docker Hub
-    runs-on:  ubuntu-latest
-    needs: checkout_and_build
-    steps:
       - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v1.1.0
         with:
@@ -51,4 +44,4 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
           repository: utahcon/hugo
           dockerfile: Containerfile
-          tags: latest, ${{ needs.checkout_and_build.outputs.version }}
+          tags: latest, ${{ steps.checkout_and_build.version }}
