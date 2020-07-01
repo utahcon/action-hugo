@@ -67,6 +67,7 @@ jobs:
         run: |
           git checkout -b ${{ needs.checkout_and_build_hugo.outputs.version  }}
           git push origin :refs/tags/latest
+          git push origin :${{ needs.checkout_and_build_hugo.outputs.version  }}
           git tag -af latest -m "Version ${{ needs.checkout_and_build_hugo.outputs.version  }}"
           git push origin ${{ needs.checkout_and_build_hugo.outputs.version }} --tags
 
