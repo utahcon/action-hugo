@@ -21,21 +21,32 @@ jobs:
       - id: install_hugo
         name: Install Hugo
         run: |
-          cd hugo
-          latest=$(git tag | sort -rV | head -n 1)
-          git checkout $latest
-          go install --tags extended
-          cp $HOME/go/bin/hugo .
-          ./hugo version
-          cd ..
-          sed "s/%%version%%/${latest}/" action.yml.tmp > action.yml
+          echo "Installing Hugo" >&2
+          LATEST=$(
+            cd hugo
+            LATEST=$(git tag | sort -rV | head -n 1)
+            git checkout $LATEST
+            go install --tags extended
+            mv $HOME/go/bin/hugo .
+            ./hugo version >&2
+            echo "${LATEST}"
+          )
+          echo "Installed version: ${LATEST}" >&2
+
+          echo "Creating action.yml" >&2
+          sed "s/%%version%%/${LATEST}/" action.yml.tmp > action.yml
+
+          echo "Commit new action.yml" >&2
           git config user.email "github@utahcon.com"
           git config user.name "Github Gitbot"
           git add action.yml
-          git commit -m "Adding/updating version tag ${latest}"
-          git tag -af ${latest} -m "Version ${latest}"
-          git push --all
-          echo "::set-output name=version::${latest}"
+          git commit -m "Updating action.yml with version ${LATEST}"
+          git push origin :refs/tags/${LATEST}
+          git push origni :refs/tags/latest
+          git tag -af ${LATEST} -m "Version ${LATEST}"
+          git tag -af latest -m "Version ${LATEST}"
+          git push --tags
+          echo "::set-output name=version::${LATEST}"
 
       - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v1.1.0
