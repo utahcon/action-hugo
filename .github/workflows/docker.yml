@@ -80,11 +80,12 @@ jobs:
           echo "Cleaning tags"
           for TAG in $(git tag); do
             if [ $TAG == "${{ needs.checkout_and_build_hugo.outputs.version  }}" ]; then
-              git push origin :refs/tags/latest
+              git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version  }}
             fi
           done
 
           echo "Moving git tag latest"
+          git push origin :refs/tags/latest
           git tag -af latest -m "Version ${{ needs.checkout_and_build_hugo.outputs.version  }}"
 
           echo "Pushing branch and tags"
