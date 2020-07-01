@@ -70,8 +70,6 @@ jobs:
           for BRANCH in $(git branch -r); do
             echo "Checking $BRANCH against origin/${{ needs.checkout_and_build_hugo.outputs.version }}"
             if [ $BRANCH == "origin/${{ needs.checkout_and_build_hugo.outputs.version }}" ]; then
-              echo git branch -D ${{ needs.checkout_and_build_hugo.outputs.version }}
-              git branch -D ${{ needs.checkout_and_build_hugo.outputs.version }}
               echo git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version  }}
               git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version  }}
               echo git push origin :${{ needs.checkout_and_build_hugo.outputs.version }}
