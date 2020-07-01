@@ -28,7 +28,7 @@ jobs:
           cp $HOME/go/bin/hugo .
           ./hugo version
           cd ..
-          sed -i "s/%%version%%/${latest}/" action.yml
+          sed -i "s/%%version%%/${latest}/" action.yml.tmp > action.yml
           git config user.email "github@utahcon.com"
           git config user.name "Github Gitbot"
           git add action.yml
