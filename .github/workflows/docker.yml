@@ -58,10 +58,7 @@ jobs:
       - id: create_action_yml
         name: Create action.yml
         run: |
-          ls -Al
           sed "s/%%version%%/${{ needs.checkout_and_build_hugo.outputs.version }}/" action.yml.tmp > action.yml
-          ls -Al
-          git status
           git add action.yml
           git commit -m "Updating action.yml with version ${{ needs.checkout_and_build_hugo.outputs.version }}"
 
@@ -71,7 +68,7 @@ jobs:
           git checkout -b ${{ needs.checkout_and_build_hugo.outputs.version  }}
           git push origin :refs/tags/latest
           git tag -af latest -m "Version ${{ needs.checkout_and_build_hugo.outputs.version  }}"
-          git push origin ${{ steps.install_hugo.version }} --tags
+          git push origin ${{ needs.checkout_and_build_hugo.outputs.version }} --tags
 
       - id: download_hugo_artifact
         name: Download Hugo artifact
