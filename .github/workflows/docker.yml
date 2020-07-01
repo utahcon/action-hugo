@@ -44,4 +44,4 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
           repository: utahcon/hugo
           dockerfile: Containerfile
-          tags: latest,${{ steps.checkout_and_build.version }}
+          tags: latest,${{ steps.install_hugo.version }}
