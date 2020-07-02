@@ -106,7 +106,7 @@ jobs:
         name: chmod Hugo artifact
         run: |
           chmod +x hugo
-          /hugo version
+          ./hugo version
 
       - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v1.1.0

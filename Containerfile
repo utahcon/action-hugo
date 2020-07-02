@@ -1,7 +1,7 @@
 FROM archlinux:latest
 
 # Copy Hugo Binary into place (Specific to Github runners)
-COPY hugo/hugo hugo
+COPY hugo hugo
 
 # Copy in the entrypoint
 COPY entrypoint.sh entrypoint.sh
