@@ -1,0 +1,62 @@
+name: Hugo Version Checker
+
+jobs:
+  hugo:
+    name: Checkout Hugo
+    runs-on: ubuntu-latest
+    outputs:
+      hugo_version: ${{ steps.get_hugo_version.outputs.version }}
+    steps:
+      - id: checkout_hugo
+        name: Checkout Hugo Repo
+        uses: actions/checkout@v2.3.1
+        with:
+          path: hugo
+          repository: gohugoio/hugo
+          submodules: true
+          fetch-depth: 0
+
+      - id: get_hugo_version
+        name: Check Hugo Version
+        run: checker.sh -m hugo_version
+
+  builder:
+    name: Checkout Builder
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.get_builder_version.outputs.versions }}
+    steps:
+      - id: checkout_builder
+        name: Checkout Builder
+        uses: actions/checkout@v2.3.1
+        with:
+          path: builder
+
+      - id: get_builder_version
+        name: Get Builder Version
+        run: |
+          ch builder
+          BUILDER_VERSIONS=$(git tag | sort -rV)
+          echo "::set-output name=versions::${BUILDER_VERSIONS}"
+
+  check_versions:
+    name: Check Versions
+    runs-on: ubuntu-latest
+    needs:
+      - hugo
+      - builder
+    steps:
+      - id: check_hugo_vs_builder
+        name: Check Hugo against Builder
+        run: |
+          BUILDER_VERSIONS=${{needs.builder.outputs.versions}}
+          HUGO_VERSION=${{needs.hugo.outputs.version}}
+          for BV in "${BUILDER_VERSIONS}"; do
+            if [ "${BV}" == "${HUGO_VERSION}" ]; then
+              MUST_BUILD=0
+            fi
+          done
+
+          if [ ${MUST_BUILD} ]; then
+            echo "Create Builder Version: ${HUGO_VERSION}"
+          fi
