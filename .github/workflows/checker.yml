@@ -60,6 +60,9 @@ jobs:
     steps:
       - name: Check Hugo against Builder
         run: |
+          pwd
+          ls -al
+
           for BV in "${{ needs.action.outputs.versions }}"; do
             if [ "${BV}" == "${{ needs.hugo.outputs.version }}" ]; then
               exit
