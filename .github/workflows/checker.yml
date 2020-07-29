@@ -22,16 +22,9 @@ jobs:
       - id: action_version
         name: Get Builder Version
         run: |
-          pwd
-          ls -al
           cd action
-          pwd
-          ls -al
-          git version
           git fetch --all
-          git tag | sort -rV
           VERSIONS=$(git tag | sort -rV)
-          echo "${VERSIONS}"
           echo "::set-output name=versions::${VERSIONS}"
 
   hugo:
@@ -74,7 +67,8 @@ jobs:
 
           echo "Create Builder Version: ${{ needs.hugo.outputs.version }}"
           echo "${{ needs.hugo.outputs.version}}" > BUILD_VERSION
-          /usr/bin/git checkout -b build
-          /usr/bin/git add BUILD_VERSION
-          /usr/bin/git commit -m "Kicking off build for ${{ needs.hugo.outputs.version }}"
-          /usr/bin/git push origin ${{ needs.hugo.outputs.version }}
+          cd action
+          git checkout -b build
+          git add BUILD_VERSION
+          git commit -m "Kicking off build for ${{ needs.hugo.outputs.version }}"
+          git push origin ${{ needs.hugo.outputs.version }}
