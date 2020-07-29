@@ -24,8 +24,8 @@ jobs:
         run: |
           cd action
           git fetch --all
-          echo "${VERSIONS}"
           VERSIONS=$(git tag | sort -rV)
+          echo "${VERSIONS}"
           echo "::set-output name=versions::${VERSIONS}"
 
   hugo:
