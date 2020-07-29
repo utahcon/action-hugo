@@ -2,7 +2,7 @@ name: Hugo Builder
 
 on:
   push:
-    branch:
+    branches:
       - build
 
 jobs:
@@ -10,7 +10,7 @@ jobs:
     name: Checkout action-hugo
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the repo
+      - name: Checkout Action
         uses: actions/checkout@v2.3.1
 
       - id: get_version
@@ -18,13 +18,14 @@ jobs:
         run: |
           echo "::set-output name=hugo_version::$(cat BUILD_VERSION)"
 
-      - name: Check out the repo
+      - name: Checkout Hugo
         uses: actions/checkout@v2.3.1
         with:
           ref: ${{ steps.get_version.outputs.version }}
           repository: gohugoio/hugo
           submodules: true
           fetch-depth: 0
+          path: hugo
 
       - name: Build Hugo
         run: |
