@@ -45,6 +45,7 @@ jobs:
         name: Check Hugo Version
         run: |
           cd hugo
+          git fetch --all
           VERSION=$(git tag | sort -rV | head -n 1)
           echo "${VERSION}"
           echo "::set-output name=version::${VERSION}"
