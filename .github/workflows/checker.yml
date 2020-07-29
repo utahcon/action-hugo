@@ -16,11 +16,12 @@ jobs:
     steps:
       - name: Checkout Action
         uses: actions/checkout@v2.3.1
+        path: action
 
       - id: action_version
         name: Get Builder Version
         run: |
-          git version
+          cd action
           git tag | sort -rV
           VERSIONS=$(git tag | sort -rV)
           echo "${VERSIONS}"
