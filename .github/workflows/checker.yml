@@ -16,7 +16,8 @@ jobs:
     steps:
       - name: Checkout Action
         uses: actions/checkout@v2.3.1
-        path: action
+        with:
+          path: action
 
       - id: action_version
         name: Get Builder Version
