@@ -44,6 +44,7 @@ jobs:
         run: |
           cd builder
           ls -al
+          git tag | sort -rV
           VERSIONS=$(git tag | sort -rV)
           echo "${VERSIONS}"
           echo "::set-output name=versions::${VERSIONS}"
