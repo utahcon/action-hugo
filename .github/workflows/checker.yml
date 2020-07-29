@@ -1,5 +1,9 @@
 name: Hugo Version Checker
 
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
 jobs:
   hugo:
     name: Checkout Hugo
@@ -7,8 +11,7 @@ jobs:
     outputs:
       hugo_version: ${{ steps.get_hugo_version.outputs.version }}
     steps:
-      - id: checkout_hugo
-        name: Checkout Hugo Repo
+      - name: Checkout Hugo Repo
         uses: actions/checkout@v2.3.1
         with:
           path: hugo
@@ -26,8 +29,7 @@ jobs:
     outputs:
       versions: ${{ steps.get_builder_version.outputs.versions }}
     steps:
-      - id: checkout_builder
-        name: Checkout Builder
+      - name: Checkout Builder
         uses: actions/checkout@v2.3.1
         with:
           path: builder
@@ -46,17 +48,19 @@ jobs:
       - hugo
       - builder
     steps:
-      - id: check_hugo_vs_builder
-        name: Check Hugo against Builder
+      - name: Check Hugo against Builder
         run: |
-          BUILDER_VERSIONS=${{needs.builder.outputs.versions}}
+          BUILDER_VERSIONS=${{ needs.builder.outputs.versions }}
           HUGO_VERSION=${{needs.hugo.outputs.version}}
           for BV in "${BUILDER_VERSIONS}"; do
             if [ "${BV}" == "${HUGO_VERSION}" ]; then
-              MUST_BUILD=0
+              exit
             fi
           done
 
-          if [ ${MUST_BUILD} ]; then
-            echo "Create Builder Version: ${HUGO_VERSION}"
-          fi
+          echo "Create Builder Version: ${HUGO_VERSION}"
+          echo "${{ needs.hugo.outputs.version}}" > BUILD_VERSION
+          git checkout -b build
+          git add BUILD_VERSION
+          git commit -m "Kicking off build for ${{needs.hugo.outputs.version}}"
+          git push origin ${{needs.hugo.outputs.version}}

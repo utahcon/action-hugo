@@ -1,118 +1,118 @@
-name: Hugo Builder
-
-on:
-  push:
-    branch:
-      - master
-
-jobs:
-  checkout_and_build_hugo:
-    name: Pull and Build Hugo
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.install_hugo.outputs.version }}
-    steps:
-      - id: check_out_the_repo
-        name: Check out the repo
-        uses: actions/checkout@v2.3.1
-        with:
-          repository: gohugoio/hugo
-          submodules: true # Fetch Hugo
-          fetch-depth: 0   # Fetch all history for .GitInfo and Lastmod
-
-      - id: install_hugo
-        name: Install Hugo
-        run: |
-          LATEST=$(
-            LATEST=$(git tag | sort -rV | head -n 1)
-            git checkout $LATEST >&2
-            go install --tags extended >&2
-            mv $HOME/go/bin/hugo .
-            ./hugo version >&2
-            echo "${LATEST}"
-          )
-          echo "Installed version: ${LATEST}"
-          echo "::set-output name=version::${LATEST}"
-
-      - name: Store Hugo Artifact
-        uses: actions/upload-artifact@v1
-        with:
-          name: hugo
-          path: hugo
-
-  checkout_and_build_container:
-    name: Pull and Build action-hugo
-    runs-on: ubuntu-latest
-    needs: checkout_and_build_hugo
-    steps:
-      - id: check_out_the_repo
-        name: Check out the repo
-        uses: actions/checkout@v2.3.1
-
-      - id: identify
-        name: ID with Git
-        run: |
-          git fetch --all
-          git config user.email "github@utahcon.com"
-          git config user.name "Utahcon"
-
-      - id: create_action_yml
-        name: Create action.yml
-        run: |
-          sed "s/%%version%%/${{ needs.checkout_and_build_hugo.outputs.version }}/" action.yml.tmp > action.yml
-          git add action.yml
-          git commit -m "Updating action.yml with version ${{ needs.checkout_and_build_hugo.outputs.version }}"
-
-      - id: create_new_version_branch
-        name: Create new version branch
-        run: |
-          echo "Cleaning branches"
-          for BRANCH in $(git branch -r); do
-            echo "Checking $BRANCH against origin/${{ needs.checkout_and_build_hugo.outputs.version }}"
-            if [ $BRANCH == "origin/${{ needs.checkout_and_build_hugo.outputs.version }}" ]; then
-              echo git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version  }}
-              git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version  }}
-              echo git push origin :${{ needs.checkout_and_build_hugo.outputs.version }}
-              git push origin :${{ needs.checkout_and_build_hugo.outputs.version }}
-            fi
-          done
-
-          echo "Creating branch: ${{ needs.checkout_and_build_hugo.outputs.version }}"
-          echo git checkout -b ${{ needs.checkout_and_build_hugo.outputs.version }}
-          git checkout -b ${{ needs.checkout_and_build_hugo.outputs.version }}
-
-          echo "Cleaning tags"
-          for TAG in $(git tag); do
-            if [ $TAG == "${{ needs.checkout_and_build_hugo.outputs.version }}" ]; then
-              echo git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version }}
-              git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version }}
-            fi
-          done
-
-          echo "Moving git tag latest"
-          git push origin :refs/tags/latest
-          git tag -af latest -m "Version ${{ needs.checkout_and_build_hugo.outputs.version }}"
-
-          echo "Pushing branch and tags"
-          git push origin ${{ needs.checkout_and_build_hugo.outputs.version }} --tags
-
-      - id: download_hugo_artifact
-        name: Download Hugo artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: hugo
-
-      - id: chmod_hugo_artifact
-        name: chmod Hugo artifact
-        run: |
-          chmod +x hugo
-          ./hugo version
-
-      - name: Build and Push to Docker Hub
-        uses: docker/build-push-action@v1.1.0
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-          repository: utahcon/hugo
-          dockerfile: Containerfile
-          tags: latest,${{ needs.checkout_and_build_hugo.outputs.version }}
+#name: Hugo Builder
+#
+#on:
+#  push:
+#    branch:
+#      - master
+#
+#jobs:
+#  checkout_and_build_hugo:
+#    name: Pull and Build Hugo
+#    runs-on: ubuntu-latest
+#    outputs:
+#      version: ${{ steps.install_hugo.outputs.version }}
+#    steps:
+#      - id: check_out_the_repo
+#        name: Check out the repo
+#        uses: actions/checkout@v2.3.1
+#        with:
+#          repository: gohugoio/hugo
+#          submodules: true # Fetch Hugo
+#          fetch-depth: 0   # Fetch all history for .GitInfo and Lastmod
+#
+#      - id: install_hugo
+#        name: Install Hugo
+#        run: |
+#          LATEST=$(
+#            LATEST=$(git tag | sort -rV | head -n 1)
+#            git checkout $LATEST >&2
+#            go install --tags extended >&2
+#            mv $HOME/go/bin/hugo .
+#            ./hugo version >&2
+#            echo "${LATEST}"
+#          )
+#          echo "Installed version: ${LATEST}"
+#          echo "::set-output name=version::${LATEST}"
+#
+#      - name: Store Hugo Artifact
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: hugo
+#          path: hugo
+#
+#  checkout_and_build_container:
+#    name: Pull and Build action-hugo
+#    runs-on: ubuntu-latest
+#    needs: checkout_and_build_hugo
+#    steps:
+#      - id: check_out_the_repo
+#        name: Check out the repo
+#        uses: actions/checkout@v2.3.1
+#
+#      - id: identify
+#        name: ID with Git
+#        run: |
+#          git fetch --all
+#          git config user.email "github@utahcon.com"
+#          git config user.name "Utahcon"
+#
+#      - id: create_action_yml
+#        name: Create action.yml
+#        run: |
+#          sed "s/%%version%%/${{ needs.checkout_and_build_hugo.outputs.version }}/" action.yml.tmp > action.yml
+#          git add action.yml
+#          git commit -m "Updating action.yml with version ${{ needs.checkout_and_build_hugo.outputs.version }}"
+#
+#      - id: create_new_version_branch
+#        name: Create new version branch
+#        run: |
+#          echo "Cleaning branches"
+#          for BRANCH in $(git branch -r); do
+#            echo "Checking $BRANCH against origin/${{ needs.checkout_and_build_hugo.outputs.version }}"
+#            if [ $BRANCH == "origin/${{ needs.checkout_and_build_hugo.outputs.version }}" ]; then
+#              echo git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version  }}
+#              git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version  }}
+#              echo git push origin :${{ needs.checkout_and_build_hugo.outputs.version }}
+#              git push origin :${{ needs.checkout_and_build_hugo.outputs.version }}
+#            fi
+#          done
+#
+#          echo "Creating branch: ${{ needs.checkout_and_build_hugo.outputs.version }}"
+#          echo git checkout -b ${{ needs.checkout_and_build_hugo.outputs.version }}
+#          git checkout -b ${{ needs.checkout_and_build_hugo.outputs.version }}
+#
+#          echo "Cleaning tags"
+#          for TAG in $(git tag); do
+#            if [ $TAG == "${{ needs.checkout_and_build_hugo.outputs.version }}" ]; then
+#              echo git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version }}
+#              git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version }}
+#            fi
+#          done
+#
+#          echo "Moving git tag latest"
+#          git push origin :refs/tags/latest
+#          git tag -af latest -m "Version ${{ needs.checkout_and_build_hugo.outputs.version }}"
+#
+#          echo "Pushing branch and tags"
+#          git push origin ${{ needs.checkout_and_build_hugo.outputs.version }} --tags
+#
+#      - id: download_hugo_artifact
+#        name: Download Hugo artifact
+#        uses: actions/download-artifact@v2
+#        with:
+#          name: hugo
+#
+#      - id: chmod_hugo_artifact
+#        name: chmod Hugo artifact
+#        run: |
+#          chmod +x hugo
+#          ./hugo version
+#
+#      - name: Build and Push to Docker Hub
+#        uses: docker/build-push-action@v1.1.0
+#        with:
+#          username: ${{ secrets.DOCKER_USERNAME }}
+#          password: ${{ secrets.DOCKER_TOKEN }}
+#          repository: utahcon/hugo
+#          dockerfile: Containerfile
+#          tags: latest,${{ needs.checkout_and_build_hugo.outputs.version }}

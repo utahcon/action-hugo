@@ -10,8 +10,7 @@ jobs:
     name: Checkout action-hugo
     runs-on: ubuntu-latest
     steps:
-      - id: check_out_the_repo
-        name: Check out the repo
+      - name: Check out the repo
         uses: actions/checkout@v2.3.1
 
   build_version:
@@ -20,8 +19,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
-      - id: version
-        name: Get Version
+      - name: Get Version
         run: |
           VERSION=$(cat BUILD_VERSION)
           echo "::set-output name=version::${VERSION}"
@@ -29,11 +27,12 @@ jobs:
   checkout_hugo:
     name: Checkout Hugo
     runs-on: ubuntu-latest
+    needs: build_version
     steps:
-      - id: check_out_the_repo
-        name: Check out the repo
+      - name: Check out the repo
         uses: actions/checkout@v2.3.1
         with:
+          ref: ${{ needs.build_version.outputs.version }}
           repository: gohugoio/hugo
           submodules: true # Fetch Hugo
           fetch-depth: 0   # Fetch all history for .GitInfo and Lastmod
@@ -43,78 +42,49 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_version
     steps:
-      - id: build_hugo
-        name: Build Hugo
+      - name: Build Hugo
         run: |
           cd hugo || exit
-          git checkout ${{ needs.build_version.outputs.version }}
           go install --tags extended
           mv $HOME/go/bin/hugo .
           chmod +x hugo
 
+  clean_build_branch:
+    name: Clean build Branch
+    runs-on: ubuntu-latest
+    needs: checkout_action_hugo
+    steps:
+      - name: Checkout Build Branch
+        run: |
+          git push origin :refs/tags/release-${{ needs.build_version.outputs.version }}
+          git push origin :release-${{ needs.build_version.outputs.version }}
+          git checkout -b release-${{ needs.build_version.outputs.version }}
+
+  clean_version_tag:
+    name: Clean version tag
+    runs-on: ubuntu-latest
+    needs: checkout_action_hugo
+    steps:
+      - name: Clean version tag
+        run: |
+          git push origin :refs/tags/${{ needs.build_version.outputs.version }}
+
   transform_action_yml:
     name: Transform action.yml
     runs-on: ubuntu-latest
-    needs: checkout_action
+    needs: checkout_build_branch
     steps:
-      - id: create_action_yml
-        name: Create action.yml
+      - name: Create action.yml
         run: |
-          VERSION=$(cat BUILD_VERSION)
-          sed "s/%%version%%/${BUILD_VERSION}/" action.yml.tmp > action.yml
+          VERSION=${{ needs.build_version.outputs.version }}
+          sed "s/%%version%%/${VERSION}/" action.yml.tmp > action.yml
           git add action.yml
           git commit -m "Updating action.yml with version ${VERSION}"
 
-  create_new_branch:
-    name: Create New Branch
+  build_and_push_container:
+    name: Build and Push Container
     runs-on: ubuntu-latest
-    needs: transform_action_yml
     steps:
-      - id: create_new_version_branch
-        name: Create new version branch
-        run: |
-          echo "Cleaning branches"
-          for BRANCH in $(git branch -r); do
-            echo "Checking $BRANCH against origin/${{ needs.checkout_and_build_hugo.outputs.version }}"
-            if [ $BRANCH == "origin/${{ needs.checkout_and_build_hugo.outputs.version }}" ]; then
-              echo git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version  }}
-              git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version  }}
-              echo git push origin :${{ needs.checkout_and_build_hugo.outputs.version }}
-              git push origin :${{ needs.checkout_and_build_hugo.outputs.version }}
-            fi
-          done
-
-          echo "Creating branch: ${{ needs.checkout_and_build_hugo.outputs.version }}"
-          echo git checkout -b ${{ needs.checkout_and_build_hugo.outputs.version }}
-          git checkout -b ${{ needs.checkout_and_build_hugo.outputs.version }}
-
-          echo "Cleaning tags"
-          for TAG in $(git tag); do
-            if [ $TAG == "${{ needs.checkout_and_build_hugo.outputs.version }}" ]; then
-              echo git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version }}
-              git push origin :refs/tags/${{ needs.checkout_and_build_hugo.outputs.version }}
-            fi
-          done
-
-          echo "Moving git tag latest"
-          git push origin :refs/tags/latest
-          git tag -af latest -m "Version ${{ needs.checkout_and_build_hugo.outputs.version }}"
-
-          echo "Pushing branch and tags"
-          git push origin ${{ needs.checkout_and_build_hugo.outputs.version }} --tags
-
-      - id: download_hugo_artifact
-        name: Download Hugo artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: hugo
-
-      - id: chmod_hugo_artifact
-        name: chmod Hugo artifact
-        run: |
-          chmod +x hugo
-          ./hugo version
-
       - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v1.1.0
         with:
@@ -122,4 +92,4 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
           repository: utahcon/hugo
           dockerfile: Containerfile
-          tags: latest,${{ needs.checkout_and_build_hugo.outputs.version }}
+          tags: ${{ needs.build_version.outputs.version }}
