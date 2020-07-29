@@ -22,7 +22,12 @@ jobs:
       - id: action_version
         name: Get Builder Version
         run: |
+          pwd
+          ls
           cd action
+          pwd
+          ls
+          git version
           git tag | sort -rV
           VERSIONS=$(git tag | sort -rV)
           echo "${VERSIONS}"
