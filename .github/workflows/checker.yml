@@ -25,7 +25,7 @@ jobs:
           cd action
           git fetch --all
           VERSIONS=$(git tag | sort -rV)
-          echo "::set-output name=versions::${VERSIONS}"
+          echo "::set-output name=versions::${VERSIONS[@]}"
 
   hugo:
     name: Checkout Hugo
