@@ -55,5 +55,5 @@ jobs:
             git checkout -b build
             git add BUILD_VERSION
             git commit -m "Kicking off build for ${H_VERSION}"
-            git push origin ${H_VERSION}
+            git push origin build
           )
