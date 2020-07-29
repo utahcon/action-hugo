@@ -23,10 +23,10 @@ jobs:
         name: Get Builder Version
         run: |
           pwd
-          ls
+          ls -al
           cd action
           pwd
-          ls
+          ls -al
           git version
           git tag | sort -rV
           VERSIONS=$(git tag | sort -rV)
