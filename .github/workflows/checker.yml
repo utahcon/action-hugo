@@ -24,7 +24,10 @@ jobs:
 
       - id: get_hugo_version
         name: Check Hugo Version
-        run: checker.sh -m hugo_version
+        run: |
+          cd hugo
+          VERSION=$(git tag | sort -rV | head -n 1)
+          echo "::set-output name=version::${VERSION}"
 
   builder:
     name: Checkout Builder
@@ -40,7 +43,7 @@ jobs:
       - id: get_builder_version
         name: Get Builder Version
         run: |
-          ch builder
+          cd builder
           BUILDER_VERSIONS=$(git tag | sort -rV)
           echo "::set-output name=versions::${BUILDER_VERSIONS}"
 
