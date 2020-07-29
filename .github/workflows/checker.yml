@@ -28,9 +28,8 @@ jobs:
           pwd
           ls -al
           git version
-          echo $?
+          git fetch --all
           git tag | sort -rV
-          echo $?
           VERSIONS=$(git tag | sort -rV)
           echo "${VERSIONS}"
           echo "::set-output name=versions::${VERSIONS}"
