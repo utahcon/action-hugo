@@ -43,7 +43,9 @@ jobs:
         name: Get Builder Version
         run: |
           cd builder
-          echo "::set-output name=versions::$(git tag | sort -rV)"
+          VERSIONS=$(git tag | sort -rV)
+          echo "${VERSIONS}"
+          echo "::set-output name=versions::${VERSIONS}"
 
   check_versions:
     name: Check Versions
