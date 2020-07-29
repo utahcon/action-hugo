@@ -20,7 +20,7 @@ jobs:
       - id: get_builder_version
         name: Get Builder Version
         run: |
-          VERSIONS=$(git tag | sort -rV)
+          VERSIONS=$(/usr/bin/git tag | sort -rV)
           echo "${VERSIONS}"
           echo "::set-output name=versions::${VERSIONS}"
 
@@ -43,7 +43,9 @@ jobs:
         name: Check Hugo Version
         run: |
           cd hugo
-          echo "::set-output name=version::$(git tag | sort -rV | head -n 1)"
+          VERSION=$(/usr/bin/git tag | sort -rV | head -n 1)
+          echo "${VERSION}"
+          echo "::set-output name=version::${VERSION}"
 
   check_versions:
     name: Check Versions
@@ -62,7 +64,7 @@ jobs:
 
           echo "Create Builder Version: ${{ needs.hugo.outputs.version }}"
           echo "${{ needs.hugo.outputs.version}}" > BUILD_VERSION
-          git checkout -b build
-          git add BUILD_VERSION
-          git commit -m "Kicking off build for ${{ needs.hugo.outputs.version }}"
-          git push origin ${{ needs.hugo.outputs.version }}
+          /usr/bin/git checkout -b build
+          /usr/bin/git add BUILD_VERSION
+          /usr/bin/git commit -m "Kicking off build for ${{ needs.hugo.outputs.version }}"
+          /usr/bin/git push origin ${{ needs.hugo.outputs.version }}
