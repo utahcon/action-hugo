@@ -13,35 +13,19 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2.3.1
 
-  build_version:
-    name: Get action-hugo build version
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-    steps:
-      - name: Get Version
+      - id: get_version
+        name: Get Version
         run: |
-          VERSION=$(cat BUILD_VERSION)
-          echo "::set-output name=version::${VERSION}"
+          echo "::set-output name=hugo_version::${cat BUILD_VERSION}
 
-  checkout_hugo:
-    name: Checkout Hugo
-    runs-on: ubuntu-latest
-    needs: build_version
-    steps:
       - name: Check out the repo
         uses: actions/checkout@v2.3.1
         with:
-          ref: ${{ needs.build_version.outputs.version }}
+          ref: ${{ steps.get_version.outputs.version }}
           repository: gohugoio/hugo
-          submodules: true # Fetch Hugo
-          fetch-depth: 0   # Fetch all history for .GitInfo and Lastmod
+          submodules: true
+          fetch-depth: 0
 
-  build_hugo:
-    name: Build Hugo
-    runs-on: ubuntu-latest
-    needs: build_version
-    steps:
       - name: Build Hugo
         run: |
           cd hugo || exit
@@ -49,42 +33,22 @@ jobs:
           mv $HOME/go/bin/hugo .
           chmod +x hugo
 
-  clean_build_branch:
-    name: Clean build Branch
-    runs-on: ubuntu-latest
-    needs: checkout_action_hugo
-    steps:
       - name: Checkout Build Branch
         run: |
-          git push origin :refs/tags/release-${{ needs.build_version.outputs.version }}
-          git push origin :release-${{ needs.build_version.outputs.version }}
-          git checkout -b release-${{ needs.build_version.outputs.version }}
+          git push origin :refs/tags/release-${{ steps.get_version.outputs.version }}
+          git push origin :release-${{ steps.get_version.outputs.version }}
+          git checkout -b release-${{ steps.get_version.outputs.version }}
 
-  clean_version_tag:
-    name: Clean version tag
-    runs-on: ubuntu-latest
-    needs: checkout_action_hugo
-    steps:
       - name: Clean version tag
         run: |
-          git push origin :refs/tags/${{ needs.build_version.outputs.version }}
+            git push origin :refs/tags/${{ steps.get_version.outputs.version }}
 
-  transform_action_yml:
-    name: Transform action.yml
-    runs-on: ubuntu-latest
-    needs: checkout_build_branch
-    steps:
       - name: Create action.yml
         run: |
-          VERSION=${{ needs.build_version.outputs.version }}
-          sed "s/%%version%%/${VERSION}/" action.yml.tmp > action.yml
+          sed "s/%%version%%/${{ steps.get_version.outputs.version }}/" action.yml.tmp > action.yml
           git add action.yml
-          git commit -m "Updating action.yml with version ${VERSION}"
+          git commit -m "Updating action.yml with version ${{ steps.get_version.outputs.version }}"
 
-  build_and_push_container:
-    name: Build and Push Container
-    runs-on: ubuntu-latest
-    steps:
       - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v1.1.0
         with:
@@ -92,4 +56,4 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
           repository: utahcon/hugo
           dockerfile: Containerfile
-          tags: ${{ needs.build_version.outputs.version }}
+          tags: ${{ steps.get_version.outputs.version }}
