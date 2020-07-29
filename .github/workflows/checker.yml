@@ -32,14 +32,14 @@ jobs:
             git fetch --all 2>&1
             git tag | sort -rV
           )
-          echo "${A_VERSIONS}"
+          echo "Action: ${A_VERSIONS}"
 
           H_VERSION=$(
             cd hugo
             git fetch --all 2>&1
             git tag | sort -rV | head -n 1
           )
-          echo "${H_VERSION}"
+          echo "Hugo: ${H_VERSION}"
 
           for AV in "${A_VERSIONS}"; do
             if [ "${AV}" == "${H_VERSION}" ]; then
@@ -50,6 +50,8 @@ jobs:
           (
             cd action
             echo "${H_VERSION}" > BUILD_VERSION
+            git config --global user.email "github@utahcon.com"
+            git config --global user.name "Adam Barrett"
             git checkout -b build
             git add BUILD_VERSION
             git commit -m "Kicking off build for ${H_VERSION}"
