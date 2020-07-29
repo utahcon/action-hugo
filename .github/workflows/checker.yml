@@ -28,7 +28,6 @@ jobs:
           echo "::set-output name=versions::${VERSIONS}"
 
   hugo:
-    needs: action
     name: Checkout Hugo
     runs-on: ubuntu-latest
     outputs:
