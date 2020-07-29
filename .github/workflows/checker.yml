@@ -12,7 +12,7 @@ jobs:
     name: Checkout Hugo
     runs-on: ubuntu-latest
     outputs:
-      hugo_version: ${{ steps.get_hugo_version.outputs.version }}
+      version: ${{ steps.get_hugo_version.outputs.version }}
     steps:
       - name: Checkout Hugo Repo
         uses: actions/checkout@v2.3.1
@@ -26,8 +26,7 @@ jobs:
         name: Check Hugo Version
         run: |
           cd hugo
-          VERSION=$(git tag | sort -rV | head -n 1)
-          echo "::set-output name=version::${VERSION}"
+          echo "::set-output name=version::$(git tag | sort -rV | head -n 1)"
 
   builder:
     name: Checkout Builder
@@ -44,8 +43,7 @@ jobs:
         name: Get Builder Version
         run: |
           cd builder
-          BUILDER_VERSIONS=$(git tag | sort -rV)
-          echo "::set-output name=versions::${BUILDER_VERSIONS}"
+          echo "::set-output name=versions::$(git tag | sort -rV)"
 
   check_versions:
     name: Check Versions
@@ -56,17 +54,15 @@ jobs:
     steps:
       - name: Check Hugo against Builder
         run: |
-          BUILDER_VERSIONS=${{ needs.builder.outputs.versions }}
-          HUGO_VERSION=${{needs.hugo.outputs.version}}
-          for BV in "${BUILDER_VERSIONS}"; do
-            if [ "${BV}" == "${HUGO_VERSION}" ]; then
+          for BV in "${{ needs.builder.outputs.versions }}"; do
+            if [ "${BV}" == "${{ needs.hugo.outputs.version }}" ]; then
               exit
             fi
           done
 
-          echo "Create Builder Version: ${HUGO_VERSION}"
+          echo "Create Builder Version: ${{ needs.hugo.outputs.version }}"
           echo "${{ needs.hugo.outputs.version}}" > BUILD_VERSION
           git checkout -b build
           git add BUILD_VERSION
-          git commit -m "Kicking off build for ${{needs.hugo.outputs.version}}"
-          git push origin ${{needs.hugo.outputs.version}}
+          git commit -m "Kicking off build for ${{ needs.hugo.outputs.version }}"
+          git push origin ${{ needs.hugo.outputs.version }}
