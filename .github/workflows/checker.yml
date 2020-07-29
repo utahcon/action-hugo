@@ -1,11 +1,14 @@
 name: Hugo Version Checker
 
 on:
+  watch:
+    types: [started]
   schedule:
     - cron: "0 0 * * *"
 
 jobs:
   hugo:
+    if: github.actor == github.event.repository.owner.login
     name: Checkout Hugo
     runs-on: ubuntu-latest
     outputs:
