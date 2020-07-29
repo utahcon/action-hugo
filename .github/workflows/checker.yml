@@ -27,14 +27,14 @@ jobs:
 
       - name: Check Version and Kick Build
         run: |
-          A_VERSIONS=(
+          A_VERSIONS=$(
             cd action
             git fetch --all 2>&1
             git tag | sort -rV
           )
           echo "${A_VERSIONS}"
 
-          H_VERSION=(
+          H_VERSION=$(
             cd hugo
             git fetch --all 2>&1
             git tag | sort -rV | head -n 1
