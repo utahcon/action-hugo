@@ -11,68 +11,45 @@ jobs:
     if: github.actor == github.event.repository.owner.login
     name: Checkout Action
     runs-on: ubuntu-latest
-    outputs:
-      versions: ${{ steps.action_version.outputs.versions }}
     steps:
       - name: Checkout Action
         uses: actions/checkout@v2.3.1
         with:
           path: action
 
-      - id: action_version
-        name: Get Builder Version
-        run: |
-          cd action
-          git fetch --all
-          VERSIONS=$(git tag | sort -rV)
-          echo "${VERSIONS}"
-          echo "::set-output name=versions::${VERSIONS}"
-
-  hugo:
-    name: Checkout Hugo
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_hugo_version.outputs.version }}
-    steps:
       - name: Checkout Hugo Repo
-        uses: actions/checkout@v2.3.1
-        with:
-          path: hugo
-          repository: gohugoio/hugo
-          submodules: true
-          fetch-depth: 0
+          uses: actions/checkout@v2.3.1
+          with:
+            path: hugo
+            repository: gohugoio/hugo
+            submodules: true
+            fetch-depth: 0
 
-      - id: get_hugo_version
-        name: Check Hugo Version
+      - name: Check Version and Kick Build
         run: |
-          cd hugo
-          git fetch --all
-          VERSION=$(git tag | sort -rV | head -n 1)
-          echo "${VERSION}"
-          echo "::set-output name=version::${VERSION}"
+          A_VERSIONS=(
+            cd action
+            git fetch --all 2>&1
+            git tag | sort -rV
+          )
 
-  check_versions:
-    name: Check Versions
-    runs-on: ubuntu-latest
-    needs:
-      - hugo
-      - action
-    steps:
-      - name: Check Hugo against Builder
-        run: |
-          pwd
-          ls -al
+          H_VERSION=(
+            cd hugo
+            git fetch --all 2>&1
+            git tag | sort -rV | head -n 1
+          )
 
-          for BV in "${{ needs.action.outputs.versions }}"; do
-            if [ "${BV}" == "${{ needs.hugo.outputs.version }}" ]; then
+          for AV in "${A_VERSIONS}"; do
+            if [ "${AV}" == "${H_VERSION}" ]; then
               exit
             fi
           done
 
-          echo "Create Builder Version: ${{ needs.hugo.outputs.version }}"
-          echo "${{ needs.hugo.outputs.version}}" > BUILD_VERSION
-          cd action
-          git checkout -b build
-          git add BUILD_VERSION
-          git commit -m "Kicking off build for ${{ needs.hugo.outputs.version }}"
-          git push origin ${{ needs.hugo.outputs.version }}
+          (
+            cd action
+            echo "${H_VERSION}" > BUILD_VERSION
+            git checkout -b build
+            git add BUILD_VERSION
+            git commit -m "Kicking off build for ${H_VERSION}"
+            git push origin ${H_VERSION}
+          )
