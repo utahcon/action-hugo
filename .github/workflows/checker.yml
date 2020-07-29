@@ -7,8 +7,25 @@ on:
     - cron: "0 0 * * *"
 
 jobs:
-  hugo:
+  builder:
     if: github.actor == github.event.repository.owner.login
+    name: Checkout Builder
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.get_builder_version.outputs.versions }}
+    steps:
+      - name: Checkout Builder
+        uses: actions/checkout@v2.3.1
+
+      - id: get_builder_version
+        name: Get Builder Version
+        run: |
+          VERSIONS=$(git tag | sort -rV)
+          echo "${VERSIONS}"
+          echo "::set-output name=versions::${VERSIONS}"
+
+  hugo:
+    needs: builder
     name: Checkout Hugo
     runs-on: ubuntu-latest
     outputs:
@@ -27,27 +44,6 @@ jobs:
         run: |
           cd hugo
           echo "::set-output name=version::$(git tag | sort -rV | head -n 1)"
-
-  builder:
-    name: Checkout Builder
-    runs-on: ubuntu-latest
-    outputs:
-      versions: ${{ steps.get_builder_version.outputs.versions }}
-    steps:
-      - name: Checkout Builder
-        uses: actions/checkout@v2.3.1
-        with:
-          path: builder
-
-      - id: get_builder_version
-        name: Get Builder Version
-        run: |
-          cd builder
-          ls -al
-          git tag | sort -rV
-          VERSIONS=$(git tag | sort -rV)
-          echo "${VERSIONS}"
-          echo "::set-output name=versions::${VERSIONS}"
 
   check_versions:
     name: Check Versions
