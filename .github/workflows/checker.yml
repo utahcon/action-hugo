@@ -43,6 +43,7 @@ jobs:
         name: Get Builder Version
         run: |
           cd builder
+          pwd
           VERSIONS=$(git tag | sort -rV)
           echo "${VERSIONS}"
           echo "::set-output name=versions::${VERSIONS}"
