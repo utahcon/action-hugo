@@ -13,11 +13,6 @@ jobs:
       - name: Checkout Action
         uses: actions/checkout@v2.3.1
 
-      - id: get_version
-        name: Get Version
-        run: |
-          BUILD_VERSION=$(cat BUILD_VERSION)
-
       - name: Checkout Hugo
         uses: actions/checkout@v2.3.1
         with:
@@ -26,26 +21,25 @@ jobs:
           fetch-depth: 0
           path: hugo
 
-      - name: Build Hugo
+      - id: get_version
+        name: Get Version
         run: |
-          cd hugo || exit
-          git checkout ${BUILD_VERSION}
-          go install --tags extended
-          mv $HOME/go/bin/hugo .
-          chmod +x hugo
+          BUILD_VERSION=$(cat BUILD_VERSION)
 
-      - name: Checkout Build Branch
-        run: |
+          (
+            cd hugo || exit
+            git checkout ${BUILD_VERSION}
+            go install --tags extended
+            mv $HOME/go/bin/hugo .
+            chmod +x hugo
+          )
+
           git push origin :refs/tags/release-${BUILD_VERSION}
           git push origin :release-${BUILD_VERSION}
           git checkout -b release-${BUILD_VERSION}
 
-      - name: Clean version tag
-        run: |
-            git push origin :refs/tags/${BUILD_VERSION}
+          git push origin :refs/tags/${BUILD_VERSION}
 
-      - name: Create action.yml
-        run: |
           sed "s/%%version%%/${BUILD_VERSION}/" action.yml.tmp > action.yml
           git add action.yml
           git commit -m "Updating action.yml with version ${BUILD_VERSION}"
