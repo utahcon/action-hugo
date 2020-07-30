@@ -16,12 +16,11 @@ jobs:
       - id: get_version
         name: Get Version
         run: |
-          echo "::set-output name=hugo_version::$(cat BUILD_VERSION)"
+          BUILD_VERSION=$(cat BUILD_VERSION)
 
       - name: Checkout Hugo
         uses: actions/checkout@v2.3.1
         with:
-          ref: ${{ steps.get_version.outputs.version }}
           repository: gohugoio/hugo
           submodules: true
           fetch-depth: 0
@@ -30,25 +29,26 @@ jobs:
       - name: Build Hugo
         run: |
           cd hugo || exit
+          git checkout ${BUILD_VERSION}
           go install --tags extended
           mv $HOME/go/bin/hugo .
           chmod +x hugo
 
       - name: Checkout Build Branch
         run: |
-          git push origin :refs/tags/release-${{ steps.get_version.outputs.version }}
-          git push origin :release-${{ steps.get_version.outputs.version }}
-          git checkout -b release-${{ steps.get_version.outputs.version }}
+          git push origin :refs/tags/release-${BUILD_VERSION}
+          git push origin :release-${BUILD_VERSION}
+          git checkout -b release-${BUILD_VERSION}
 
       - name: Clean version tag
         run: |
-            git push origin :refs/tags/${{ steps.get_version.outputs.version }}
+            git push origin :refs/tags/${BUILD_VERSION}
 
       - name: Create action.yml
         run: |
-          sed "s/%%version%%/${{ steps.get_version.outputs.version }}/" action.yml.tmp > action.yml
+          sed "s/%%version%%/${BUILD_VERSION}/" action.yml.tmp > action.yml
           git add action.yml
-          git commit -m "Updating action.yml with version ${{ steps.get_version.outputs.version }}"
+          git commit -m "Updating action.yml with version ${BUILD_VERSION}"
 
       - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v1.1.0
@@ -57,4 +57,4 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
           repository: utahcon/hugo
           dockerfile: Containerfile
-          tags: ${{ steps.get_version.outputs.version }}
+          tags: ${BUILD_VERSION}
