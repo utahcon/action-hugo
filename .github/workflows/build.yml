@@ -27,6 +27,8 @@ jobs:
             fi
           done
 
+          git branch -r
+
           for B in $(git branch -r); do
             if [ "${B}" == "release-${VERSION}" ]; then
               git push origin :release-${VERSION}
