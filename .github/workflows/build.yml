@@ -66,7 +66,8 @@ jobs:
         run: |
           git checkout ${{ needs.checkout_action.outputs.version }}
           go install --tags extended
-          chmod +x $HOME/go/bin/hugo
+          mv $HOME/go/bin/hugo .
+          chmod +x hugo
 
       - uses: actions/upload-artifact@v2
         with:
