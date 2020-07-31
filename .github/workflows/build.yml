@@ -110,7 +110,8 @@ jobs:
           name: hugo
           path: .
 
-      - run: ls -al
+      - run: chmod +x hugo
+      - run: chmod +x entrypoint.sh
 
       - uses: docker/build-push-action@v1.1.0
         with:
