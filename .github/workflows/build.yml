@@ -20,26 +20,26 @@ jobs:
       - name: Tag and Branch
         run: |
           for T in $(git tag); do
-            if [ "${T}" == "${{ needs.checkout_action.outputs.version }}" ]; then
-              git push origin :refs/tags/${{ needs.checkout_action.outputs.version }}
+            if [ "${T}" == "$(cat BUILD_VERSION)" ]; then
+              git push origin :refs/tags/$(cat BUILD_VERSION)
             fi
           done
 
           for B in $(git branch -r); do
-            if [ "${B}" == "release-${{ needs.checkout_action.outputs.version }}" ]; then
-              git push origin :release-${{ needs.checkout_action.outputs.version }}
+            if [ "${B}" == "release-$(cat BUILD_VERSION)" ]; then
+              git push origin :release-$(cat BUILD_VERSION)
             fi
           done
 
-          git checkout -b release-${{ needs.checkout_action.outputs.version }}
+          git checkout -b release-$(cat BUILD_VERSION)
           git config --global user.email "github@utahcon.com"
           git config --global user.name "Adam Barrett"
 
-          sed "s/%%version%%/${{ needs.checkout_action.outputs.version }}/" action.yml.tmp > action.yml
+          sed "s/%%version%%/$(cat BUILD_VERSION)/" action.yml.tmp > action.yml
           git add action.yml
-          git commit -m "Updating action.yml with version ${{ needs.checkout_action.outputs.version }}"
-          git tag -af ${{ needs.checkout_action.outputs.version }} -m "Version ${{ needs.checkout_action.outputs.version }}"
-          git push origin release-${{ needs.checkout_action.outputs.version }} --tags
+          git commit -m "Updating action.yml with version $(cat BUILD_VERSION)"
+          git tag -af $(cat BUILD_VERSION) -m "Version $(cat BUILD_VERSION)"
+          git push origin release-$(cat BUILD_VERSION) --tags
 
       - uses: actions/upload-artifact@v2
         with:
