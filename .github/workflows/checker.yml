@@ -31,8 +31,8 @@ jobs:
           (
             cd action
             git fetch --all
-            git push origin :refs/tags/build
-            git push origin :build
+            git push origin :refs/tags/build || true
+            git push origin :build || true
           )
 
           A_VERSIONS=$(
