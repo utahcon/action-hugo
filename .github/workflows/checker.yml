@@ -38,7 +38,7 @@ jobs:
             cd action
             git fetch --all 1>&2
 
-            for AV in $(cd action; git tag); do
+            for AV in $(git tag); do
               echo "'${AV}' == '${H_VERSION}'"
               if [ "${AV}" == "${H_VERSION}" ]; then
                 exit
