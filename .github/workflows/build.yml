@@ -72,7 +72,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: hugo
-          path: $HOME/go/bin/hugo
+          path: hugo
 
   build_and_push_container:
     name: Build and push container
