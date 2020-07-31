@@ -24,15 +24,11 @@ trap cleanup EXIT
 
 # Checkout hugo
 git clone ${HUGO_URL} "${WORKSPACE}/hugo"
-(
-  cd "${WORKSPACE}/hugo"
-  git fetch --all
-)
 H_VERSION=$(
   cd "${WORKSPACE}/hugo"
+  git fetch --all 1>&2
   git tag | sort -rV | head -n 1
 )
-echo "Hugo: '${H_VERSION}'"
 
 # Checkout action-hugo
 git clone ${ACTION_URL} "${WORKSPACE}/action"
@@ -40,13 +36,8 @@ git clone ${ACTION_URL} "${WORKSPACE}/action"
   cd "${WORKSPACE}/action"
   git fetch --all
 )
-A_VERSIONS=$(
-  cd "${WORKSPACE}/action"
-  git tag | sort -rV
-)
-echo "Action: '${A_VERSIONS}'"
 
-for AV in ${A_VERSIONS}; do
+for AV in $(cd "${WORKSPACE}/action"; git tag); do
   echo "'${AV}' == '${H_VERSION}'"
   if [ "${AV}" == "${H_VERSION}" ]; then
     exit

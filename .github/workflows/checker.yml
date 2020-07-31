@@ -28,43 +28,31 @@ jobs:
 
       - name: Check Version and Kick Build
         run: |
-          echo "IFS: '$IFS'"
-          (
-            cd action
-            git fetch --all
-            git push origin :refs/tags/build || true
-            git push origin :build || true
-          )
-
-          A_VERSIONS=$(
-            cd action
-            git tag | sort -rV
-          )
-          echo "Action: ${A_VERSIONS}"
-
-          (
-            cd hugo
-            git fetch --all
-          )
-
           H_VERSION=$(
             cd hugo
+            git fetch --all 1>&2
             git tag | sort -rV | head -n 1
           )
-          echo "Hugo: ${H_VERSION}"
-
-          for AV in "${A_VERSIONS}"; do
-            echo "'${AV}' == '${H_VERSION}'"
-            if [ "${AV}" == "${H_VERSION}" ]; then
-              exit
-            fi
-          done
 
           (
             cd action
+            git fetch --all 1>&2
+
+            for AV in $(cd action; git tag); do
+              echo "'${AV}' == '${H_VERSION}'"
+              if [ "${AV}" == "${H_VERSION}" ]; then
+                exit
+              fi
+            done
+
             echo "${H_VERSION}" > BUILD_VERSION
+
             git config --global user.email "github@utahcon.com"
             git config --global user.name "Adam Barrett"
+
+            git push origin :refs/tags/build || true
+            git push origin :build || true
+
             git checkout -b build
             git add BUILD_VERSION
             git commit -m "Kicking off build for ${H_VERSION}"
