@@ -53,6 +53,7 @@ jobs:
           echo "Hugo: ${H_VERSION}"
 
           for AV in "${A_VERSIONS}"; do
+            echo "'${AV}' == '${H_VERSION}'"
             if [ "${AV}" == "${H_VERSION}" ]; then
               exit
             fi
