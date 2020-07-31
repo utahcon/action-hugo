@@ -14,35 +14,51 @@ jobs:
     steps:
       - uses: actions/checkout@v2.3.1
 
-      - name: Brnach and tag
+      - name: Get build version
         run: |
           VERSION=$(cat BUILD_VERSION)
           echo "::set-output name=version::${VERSION}"
 
-          git fetch --all
+      - name: Fetch all
+        run: git fetch --all
 
-          git tag
+      - name: Remove conflicting tags
+        run: |
           for T in $(git tag); do
             if [ "${T}" == "${VERSION}" ]; then
               git push origin :refs/tags/${VERSION}
             fi
           done
 
-          git branch -r
+      - name: Remove conflicting branches
+        run: |
           for B in $(git branch -r); do
             if [ "${B}" == "origin/release-${VERSION}" ]; then
               git push origin :release-${VERSION}
             fi
           done
 
-          git checkout -b release-${VERSION}
+      - name: Identify
+        run: |
           git config --global user.email "github@utahcon.com"
           git config --global user.name "Adam Barrett"
 
+      - name: Create and checkout release branch
+        run: |
+          git checkout -b release-${VERSION}
+
+      - name: Create and commit action.yml
+        run: |
           sed "s/%%version%%/${VERSION}/" action.yml.tmp > action.yml
           git add action.yml
           git commit -m "Updating action.yml with version ${VERSION}"
+
+      - name: Create version tag
+        run: |
           git tag -af ${VERSION} -m "Version ${VERSION}"
+
+      - name: Push release branch and tags
+        run: |
           git push origin release-${VERSION} --tags --force
 
       - uses: actions/upload-artifact@v2
@@ -50,7 +66,7 @@ jobs:
           name: action-hugo
           path: .
 
-  checkout_action_hugo:
+  checkout_hugo:
     name: Checkout and build Hugo
     runs-on: ubuntu-latest
     needs: checkout_action
@@ -79,7 +95,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - checkout_action
-      - checkout_action_hugo
+      - checkout_hugo
     steps:
       - uses: actions/download-artifact@v2
         with:
