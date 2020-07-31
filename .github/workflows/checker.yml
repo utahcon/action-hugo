@@ -2,7 +2,7 @@ name: Hugo Version Checker
 
 on:
   watch:
-    types: [started]
+    types: [started] # combined with if: github.actor line allows me to kick of builds with stars
   schedule:
     - cron: "0 * * * *"
 
@@ -28,6 +28,7 @@ jobs:
 
       - name: Check Version and Kick Build
         run: |
+          echo "IFS: '$IFS'"
           (
             cd action
             git fetch --all

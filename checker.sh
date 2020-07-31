@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-set -o pipefail
-set -o errexit
+# Script for local engineering of the Checker Workflow
 
 # import https://github.com/UrsaDK/getopts_long
 source ./getopts_long.bash
@@ -8,81 +7,51 @@ source ./getopts_long.bash
 # set some variables
 HUGO_URL="https://github.com/gohugoio/hugo.git"
 ACTION_URL="https://github.com/utahcon/action-hugo"
-
-set +o nounset
 if [ -z $GITHUB_ACTIONS ]; then GITHUB_ACTIONS=false; fi
-set -o nounset
 
+# Turn on strict mode
+set -euo pipefail
 
-function get_version {
-  echo "---"
-  echo "Determine ${1} Version"
-  if [ -d $1 ]; then
-    cd "$1" || exit
-    VERSION=$(git tag | sort -rV | head -n 1)
-    if [ "${GITHUB_ACTIONS}" == "true" ]; then
-      echo "::set-output name=version::${VERSION}"
-    else
-      echo "${VERSION}"
-    fi
-  else
-    echo "$1 is not checked out, please run: $0 --clone-$1"
-  fi
-}
+# Make temporary workspace
+WORKSPACE=$(mktemp -d)
 
 function cleanup {
-  echo "---"
-  echo "Cleaning Up Hugo and Builder"
-  rm -Rf hugo
-  rm -Rf builder
+  echo -e "\n\nCleaning up"
+  rm -Rf "${WORKSPACE}"
 }
 
-function clone {
-  set +o nounset
-  REPO=$1
-  DIR=$2
-  VERSION=$3
-  set -o nounset
-  git clone $REPO $DIR
-  if [ -n $VERSION ]; then
-    git checkout $VERSION
-  fi
-}
+trap cleanup EXIT
 
-function runner {
-  echo "Hugo Build Checker"
-  if [ "${GITHUB_ACTIONS}" != "true" ]; then
-    cleanup
-    clone https://github.com/gohugoio/hugo.git hugo
-    clone https://github.com/utahcon/action-hugo builder
-  fi
+# Checkout hugo
+git clone ${HUGO_URL} "${WORKSPACE}/hugo"
+(
+  cd "${WORKSPACE}/hugo"
+  git fetch --all
+)
+H_VERSION=$(
+  cd "${WORKSPACE}/hugo"
+  git tag | sort -rV | head -n 1
+)
+echo "Hugo: '${H_VERSION}'"
 
-}
+# Checkout action-hugo
+git clone ${ACTION_URL} "${WORKSPACE}/action"
+(
+  cd "${WORKSPACE}/action"
+  git fetch --all
+)
+A_VERSIONS=$(
+  cd "${WORKSPACE}/action"
+  git tag | sort -rV
+)
+echo "Action: '${A_VERSIONS}'"
 
-while getopts_long ":h: hugo-version action-version clone-hugo clone-action" opt; do
-  case $opt in
-    "h"|"hugo-version" )
-      get_version hugo;;
-    "action-version" )
-      get_version action;;
-    "clone-hugo" )
-      clone $HUGO_URL hugo;;
-    "clone-action" )
-      clone $ACTION_URL action;;
-    * )
-      runner;;
-  esac
-done
-
-for BUILDER_VERION in ${BUILDER_VERSIONS}; do
-  echo "${BUILDER_VERION}"
-  if [ "${BUILDER_VERSION}" == "${HUGO_VERSION}" ]; then
-    MUST_BUILD=0
+for AV in ${A_VERSIONS}; do
+  echo "'${AV}' == '${H_VERSION}'"
+  if [ "${AV}" == "${H_VERSION}" ]; then
+    exit
   fi
 done
 
-echo "---"
-if [ ${MUST_BUILD} ]; then
-  echo "Build Builder Version ${HUGO_VERSION}"
-  echo -e "${HUGO_VERSION}" > BUILD_VERSION
-fi
+echo "Kick Build"
+cleanup
