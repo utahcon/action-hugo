@@ -33,18 +33,12 @@ jobs:
           repository: gohugoio/hugo
           submodules: true
           fetch-depth: 0
-          path: hugo
 
       - name: Build Hugo
         run: |
-          (
-            cd hugo || exit
-            git checkout ${{ needs.checkout_action.outputs.version }}
-            go install --tags extended
-          )
-
-          mv $HOME/go/bin/hugo .
-          chmod +x hugo
+          git checkout ${{ needs.checkout_action.outputs.version }}
+          go install --tags extended
+          chmod +x $HOME/go/bin/hugo
 
       - name: Tag and Branch
         run: |
@@ -73,7 +67,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: hugo
-          path: hugo
+          path: $HOME/go/bin/hugo
 
   build_and_push_container:
     name: Build and push container
