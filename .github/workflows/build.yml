@@ -43,7 +43,7 @@ jobs:
           git add action.yml
           git commit -m "Updating action.yml with version ${VERSION}"
           git tag -af ${VERSION} -m "Version ${VERSION}"
-          git push origin release-${VERSION} --tags
+          git push origin release-${VERSION} --tags --force
 
       - uses: actions/upload-artifact@v2
         with:
