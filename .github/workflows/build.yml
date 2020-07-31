@@ -18,9 +18,9 @@ jobs:
         run: echo "::set-output name=version::$(cat BUILD_VERSION)"
 
       - uses: actions/upload-artifact@v2
-          with:
-            name: action-hugo
-            path: .
+        with:
+          name: action-hugo
+          path: .
 
   checkout_action_hugo:
     name: Checkout action-hugo
@@ -71,9 +71,9 @@ jobs:
           git push origin release-${{ needs.checkout_action.outputs.version }} --tags
 
       - uses: actions/upload-artifact@v2
-          with:
-            name: hugo
-            path: hugo
+        with:
+          name: hugo
+          path: hugo
 
   build_and_push_container:
     name: Build and push container
@@ -81,14 +81,14 @@ jobs:
     needs: checkout-action
     steps:
       - uses: actions/download-artifact@v2
-          with:
-            name: action-hugo
-            path: .
+        with:
+          name: action-hugo
+          path: .
 
       - uses: actions/download-artifact@v2
-          with:
-            name: hugo
-            path: .
+        with:
+          name: hugo
+          path: .
 
       - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v1.1.0
