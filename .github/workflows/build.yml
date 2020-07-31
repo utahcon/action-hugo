@@ -6,13 +6,27 @@ on:
       - build
 
 jobs:
+  checkout_action:
+    name: Checkout action-hugo
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v2.3.1
+
+      - id: version
+        run: echo "::set-output name=version::$(cat BUILD_VERSION)"
+
+      - uses: actions/upload-artifact@v2
+          with:
+            name: action-hugo
+            path: .
+
   checkout_action_hugo:
     name: Checkout action-hugo
     runs-on: ubuntu-latest
+    needs: checkout_action
     steps:
-      - name: Checkout Action
-        uses: actions/checkout@v2.3.1
-
       - name: Checkout Hugo
         uses: actions/checkout@v2.3.1
         with:
@@ -24,43 +38,64 @@ jobs:
       - id: get_version
         name: Get Version
         run: |
-          BUILD_VERSION=$(cat BUILD_VERSION)
+          ${{ needs.checkout_action.outputs.version }}
 
           (
             cd hugo || exit
-            git checkout ${BUILD_VERSION}
+            git checkout ${{ needs.checkout_action.outputs.version }}
             go install --tags extended
             mv $HOME/go/bin/hugo .
             chmod +x hugo
           )
 
           for T in $(git tag); do
-            if [ "${T}" == "${BUILD_VERSION}" ]; then
-              git push origin :refs/tags/${BUILD_VERSION}
+            if [ "${T}" == "${{ needs.checkout_action.outputs.version }}" ]; then
+              git push origin :refs/tags/${{ needs.checkout_action.outputs.version }}
             fi
           done
 
           for B in $(git branch -r); do
-            if [ "${B}" == "release-${BUILD_VERSION}" ]; then
-              git push origin :release-${BUILD_VERSION}
+            if [ "${B}" == "release-${{ needs.checkout_action.outputs.version }}" ]; then
+              git push origin :release-${{ needs.checkout_action.outputs.version }}
             fi
           done
 
-          git checkout -b release-${BUILD_VERSION}
+          git checkout -b release-${{ needs.checkout_action.outputs.version }}
           git config --global user.email "github@utahcon.com"
           git config --global user.name "Adam Barrett"
 
-          sed "s/%%version%%/${BUILD_VERSION}/" action.yml.tmp > action.yml
+          sed "s/%%version%%/${{ needs.checkout_action.outputs.version }}/" action.yml.tmp > action.yml
           git add action.yml
-          git commit -m "Updating action.yml with version ${BUILD_VERSION}"
-          git tag -af ${BUILD_VERSION} -m "Version ${BUILD_VERSION}"
-          git push origin release-${BUILD_VERSION} --tags
+          git commit -m "Updating action.yml with version ${{ needs.checkout_action.outputs.version }}"
+          git tag -af ${{ needs.checkout_action.outputs.version }} -m "Version ${{ needs.checkout_action.outputs.version }}"
+          git push origin release-${{ needs.checkout_action.outputs.version }} --tags
+
+      - uses: actions/upload-artifact@v2
+          with:
+            name: hugo
+            path: hugo
+
+  build_and_push_container:
+    name: Build and push container
+    runs-on: ubuntu-latest
+    needs: checkout-action
+    steps:
+      - uses: actions/download-artifact@v2
+          with:
+            name: action-hugo
+            path: .
+
+      - uses: actions/download-artifact@v2
+          with:
+            name: hugo
+            path: .
 
       - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v1.1.0
+        needs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
           repository: utahcon/hugo
           dockerfile: Containerfile
-          tags: ${BUILD_VERSION}
+          tags: ${{ needs.checkout_action.outputs.version }}
