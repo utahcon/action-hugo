@@ -29,7 +29,7 @@ jobs:
         run: |
           for T in $(git tag); do
             if [ "${T}" == "${{ steps.version.outputs.version }}" ]; then
-              git push origin :refs/tags/${VERSION}
+              git push origin :refs/tags/${{ steps.version.outputs.version }}
             fi
           done
 
@@ -109,6 +109,8 @@ jobs:
         with:
           name: hugo
           path: .
+
+      - run: ls -al
 
       - uses: docker/build-push-action@v1.1.0
         with:
