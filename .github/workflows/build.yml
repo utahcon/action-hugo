@@ -34,15 +34,25 @@ jobs:
             chmod +x hugo
           )
 
-          git push origin :refs/tags/release-${BUILD_VERSION}
-          git push origin :release-${BUILD_VERSION}
-          git checkout -b release-${BUILD_VERSION}
+          for T in $(git tag); do
+            if [ "${T}" == "${BUILD_VERSION}" ]; then
+              git push origin :refs/tags/${BUILD_VERSION}
+            fi
+          done
 
-          git push origin :refs/tags/${BUILD_VERSION}
+          for B in $(git branch -r); do
+            if [ "${B}" == "release-${BUILD_VERSION}" ]; then
+              git push origin :release-${BUILD_VERSION}
+            fi
+          done
+
+          git checkout -b release-${BUILD_VERSION}
 
           sed "s/%%version%%/${BUILD_VERSION}/" action.yml.tmp > action.yml
           git add action.yml
           git commit -m "Updating action.yml with version ${BUILD_VERSION}"
+          git tag -afm "Version ${BUILD_VERSION}"
+          git push origin release-${BUILD_VERSION} --tags
 
       - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v1.1.0
