@@ -53,7 +53,7 @@ jobs:
           sed "s/%%version%%/${BUILD_VERSION}/" action.yml.tmp > action.yml
           git add action.yml
           git commit -m "Updating action.yml with version ${BUILD_VERSION}"
-          git tag -afm "Version ${BUILD_VERSION}"
+          git tag -af ${BUILD_VERSION} -m "Version ${BUILD_VERSION}"
           git push origin release-${BUILD_VERSION} --tags
 
       - name: Build and Push to Docker Hub
