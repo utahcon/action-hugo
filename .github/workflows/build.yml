@@ -47,6 +47,8 @@ jobs:
           done
 
           git checkout -b release-${BUILD_VERSION}
+          git config --global user.email "github@utahcon.com"
+          git config --global user.name "Adam Barrett"
 
           sed "s/%%version%%/${BUILD_VERSION}/" action.yml.tmp > action.yml
           git add action.yml
