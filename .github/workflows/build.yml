@@ -14,7 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2.3.1
 
-      - name: Get build version
+      - id: version
+        name: Get build version
         run: |
           VERSION=$(cat BUILD_VERSION)
           echo "::set-output name=version::${VERSION}"
@@ -25,7 +26,7 @@ jobs:
       - name: Remove conflicting tags
         run: |
           for T in $(git tag); do
-            if [ "${T}" == "${VERSION}" ]; then
+            if [ "${T}" == "${{ steps.version.outputs.version }}" ]; then
               git push origin :refs/tags/${VERSION}
             fi
           done
@@ -33,8 +34,8 @@ jobs:
       - name: Remove conflicting branches
         run: |
           for B in $(git branch -r); do
-            if [ "${B}" == "origin/release-${VERSION}" ]; then
-              git push origin :release-${VERSION}
+            if [ "${B}" == "origin/release-${{ steps.version.outputs.version }}" ]; then
+              git push origin :release-${{ steps.version.outputs.version }}
             fi
           done
 
@@ -45,21 +46,21 @@ jobs:
 
       - name: Create and checkout release branch
         run: |
-          git checkout -b release-${VERSION}
+          git checkout -b release-${{ steps.version.outputs.version }}
 
       - name: Create and commit action.yml
         run: |
-          sed "s/%%version%%/${VERSION}/" action.yml.tmp > action.yml
+          sed "s/%%version%%/${{ steps.version.outputs.version }}/" action.yml.tmp > action.yml
           git add action.yml
-          git commit -m "Updating action.yml with version ${VERSION}"
+          git commit -m "Updating action.yml with version ${{ steps.version.outputs.version }}"
 
       - name: Create version tag
         run: |
-          git tag -af ${VERSION} -m "Version ${VERSION}"
+          git tag -af ${{ steps.version.outputs.version }} -m "Version ${{ steps.version.outputs.version }}"
 
       - name: Push release branch and tags
         run: |
-          git push origin release-${VERSION} --tags --force
+          git push origin release-${{ steps.version.outputs.version }} --tags --force
 
       - uses: actions/upload-artifact@v2
         with:
