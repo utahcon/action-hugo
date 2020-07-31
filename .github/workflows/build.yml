@@ -19,6 +19,8 @@ jobs:
           VERSION=$(cat BUILD_VERSION)
           echo "::set-output name=version::${VERSION}"
 
+          git fetch --all
+
           for T in $(git tag); do
             if [ "${T}" == "${VERSION}" ]; then
               git push origin :refs/tags/${VERSION}
