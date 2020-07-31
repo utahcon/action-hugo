@@ -38,8 +38,6 @@ jobs:
       - id: get_version
         name: Get Version
         run: |
-          ${{ needs.checkout_action.outputs.version }}
-
           (
             cd hugo || exit
             git checkout ${{ needs.checkout_action.outputs.version }}
