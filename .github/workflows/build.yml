@@ -21,6 +21,7 @@ jobs:
 
           git fetch --all
 
+          git tag
           for T in $(git tag); do
             if [ "${T}" == "${VERSION}" ]; then
               git push origin :refs/tags/${VERSION}
@@ -28,7 +29,6 @@ jobs:
           done
 
           git branch -r
-
           for B in $(git branch -r); do
             if [ "${B}" == "release-${VERSION}" ]; then
               git push origin :release-${VERSION}
