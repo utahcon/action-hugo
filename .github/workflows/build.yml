@@ -23,7 +23,7 @@ jobs:
           path: .
 
   checkout_action_hugo:
-    name: Checkout action-hugo
+    name: Checkout and build Hugo
     runs-on: ubuntu-latest
     needs: checkout_action
     steps:
@@ -35,8 +35,7 @@ jobs:
           fetch-depth: 0
           path: hugo
 
-      - id: get_version
-        name: Get Version
+      - name: Build Hugo
         run: |
           (
             cd hugo || exit
@@ -46,6 +45,8 @@ jobs:
             chmod +x hugo
           )
 
+      - name: Tag and Branch
+        run: |
           for T in $(git tag); do
             if [ "${T}" == "${{ needs.checkout_action.outputs.version }}" ]; then
               git push origin :refs/tags/${{ needs.checkout_action.outputs.version }}
@@ -76,7 +77,9 @@ jobs:
   build_and_push_container:
     name: Build and push container
     runs-on: ubuntu-latest
-    needs: checkout_action
+    needs:
+      - checkout_action
+      - checkout_action_hugo
     steps:
       - uses: actions/download-artifact@v2
         with:
@@ -88,8 +91,7 @@ jobs:
           name: hugo
           path: .
 
-      - name: Build and Push to Docker Hub
-        uses: docker/build-push-action@v1.1.0
+      - uses: docker/build-push-action@v1.1.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
