@@ -52,6 +52,43 @@ jobs:
 
       - name: Create and commit action.yml
         run: |
+          ORIGINAL_IFS=$IFS
+          INPUTS=""
+          IFS=$'\n'
+
+          for OPTION in $(hugo --help | grep "^\s*-.*"); do
+
+            # get short option (if there is one)
+            OPTION=$(trim_left "${OPTION}")
+            SHORT=${OPTION%%,*}
+            if [[ "${SHORT:0:2}" == "--" ]]; then
+              SHORT=""
+              OPTION=${OPTION}
+            else
+              OPTION=${OPTION#*,}
+            fi
+
+            # get long option
+            OPTION=$(trim_left "${OPTION}")
+            LONG=${OPTION%% *}
+            OPTION=${OPTION#* }
+
+            # get the argument type, if there is one
+            ARGUMENT=${OPTION%% *}
+            OPTION=${OPTION#* }
+            OPTION=$(trim_left "${OPTION}")
+
+            echo "Short: '${SHORT}'"
+            echo "Long: '${LONG}'"
+            echo "Argument: '${ARGUMENT}'"
+            echo "Description: '${OPTION}'"
+
+            INPUTS+="  ${LONG:2}:\n"
+            INPUTS+="    description: ${OPTION}\n"
+            INPUTS+="    required: false\n"
+          done
+
+          echo -e $INPUTS
           sed "s/%%version%%/${{ steps.version.outputs.version }}/" action.yml.tmp > action.yml
           git add action.yml
           git commit -m "Updating action.yml with version ${{ steps.version.outputs.version }}"
