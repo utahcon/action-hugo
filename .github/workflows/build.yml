@@ -154,7 +154,7 @@ jobs:
             DESC=$(trim_left "${FLAG}")
           #  echo "Desc: '${DESC}'"
 
-            YML_INPUTS+="\n  ${LONG}\:\n    description\: \"${DESC}\"\n    required\: false"
+            YML_INPUTS+="\n  ${LONG}\:\n    description\: '${DESC}'\n    required\: false"
             YML_ARGS+="\n    - ${START} inputs.${LONG} ${END}"
             ENTRY+="\n      ${COUNT}) ARGUMENTS+=\"--${LONG} \${1} \";;"
 
