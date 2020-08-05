@@ -52,7 +52,6 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     steps:
 
-
       - name: Fetch all
         run: git fetch --all
 

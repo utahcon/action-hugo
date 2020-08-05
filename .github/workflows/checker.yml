@@ -45,16 +45,13 @@ jobs:
               fi
             done
 
-            echo "${H_VERSION}" > BUILD_VERSION
-
             git config --global user.email "github@utahcon.com"
             git config --global user.name "Adam Barrett"
 
-            git push origin :refs/tags/build || true
-            git push origin :build || true
+            git push origin :refs/tags/build-${H_VERSION} || true
+            git push origin :build-${H_VERSION} || true
 
-            git checkout -b build
-            git add BUILD_VERSION
+            git checkout -b build-${H_VERSION}
             git commit -m "Kicking off build for ${H_VERSION}"
-            git push origin build --force
+            git push origin build-${H_VERSION} --force
           )
