@@ -61,7 +61,7 @@ jobs:
           YML_ARGS=""
           ENTRY=""
           IFS=$'\n'
-          START="${{"
+          START="\${{"
           END="}}"
 
           COUNT=1
