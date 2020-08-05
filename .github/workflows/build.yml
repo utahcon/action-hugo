@@ -52,45 +52,55 @@ jobs:
 
       - name: Create and commit action.yml
         run: |
-          ORIGINAL_IFS=$IFS
-          INPUTS=""
+          function trim_left {
+            # shellcheck disable=SC2001
+            echo "${1}" | sed -e "s/^\s*//"
+          }
+
+          YML_INPUTS=""
+          YML_ARGS=""
+          ENTRY=""
           IFS=$'\n'
 
-          for OPTION in $(hugo --help | grep "^\s*-.*"); do
+          COUNT=1
 
-            # get short option (if there is one)
-            OPTION=$(trim_left "${OPTION}")
-            SHORT=${OPTION%%,*}
-            if [[ "${SHORT:0:2}" == "--" ]]; then
-              SHORT=""
-              OPTION=${OPTION}
-            else
-              OPTION=${OPTION#*,}
-            fi
+          for FLAG in $(hugo --help | grep "^\s*-.*"); do
+          #  echo -e "\n"
+            FLAG=$(trim_left "${FLAG}")
+          #  echo "'${FLAG}'"
 
-            # get long option
-            OPTION=$(trim_left "${OPTION}")
-            LONG=${OPTION%% *}
-            OPTION=${OPTION#* }
+            # Get Short Flag
+            SHORT=${FLAG%%--*}
+            SHORT=$(trim_left "${SHORT}")
+          #  echo "Short:1:2 ${SHORT:1:1}"
+            FLAG=${FLAG#*--}
 
-            # get the argument type, if there is one
-            ARGUMENT=${OPTION%% *}
-            OPTION=${OPTION#* }
-            OPTION=$(trim_left "${OPTION}")
+            # Get Long Flag
+            FLAG=$(trim_left "${FLAG}")
+            LONG=${FLAG%% *}
+            LONG=$(trim_left "${LONG}")
+          #  echo "Long: '${LONG}'"
 
-            echo "Short: '${SHORT}'"
-            echo "Long: '${LONG}'"
-            echo "Argument: '${ARGUMENT}'"
-            echo "Description: '${OPTION}'"
+            FLAG=${FLAG#* }
+            ARG=${FLAG%% *}
+          #  echo "Arg: '${ARG}'"
 
-            INPUTS+="  ${LONG:2}:\n"
-            INPUTS+="    description: ${OPTION}\n"
-            INPUTS+="    required: false\n"
+            FLAG=${FLAG#* }
+            DESC=$(trim_left "${FLAG}")
+          #  echo "Desc: '${DESC}'"
+
+            YML_INPUTS+="\n  ${LONG}\:\n    description\: ${DESC}\n    required\: false"
+            YML_ARGS+="\n    - \${{ inputs.${LONG} }}"
+            ENTRY+="\n      ${COUNT}) ARGUMENTS+=\"--${LONG} \${1} \";;"
+
+            ((COUNT=COUNT+1))
           done
 
-          echo -e $INPUTS
-          sed "s/%%version%%/${{ steps.version.outputs.version }}/" action.yml.tmp > action.yml
-          git add action.yml
+          sed -e "s;%%INPUTS%%;${YML_INPUTS};" action.yml.tmp > action.yml.tmp2
+          sed -e "s/%%ARGS%%/${YML_ARGS}/" action.yml.tmp2 > action.yml
+          sed -e "s/%%ENTRY%%/${ENTRY}/" entrypoint.sh.tmp > entrypoint.sh
+
+          git add action.yml entrypoint.sh
           git commit -m "Updating action.yml with version ${{ steps.version.outputs.version }}"
 
       - name: Create version tag

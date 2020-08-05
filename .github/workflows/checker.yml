@@ -4,7 +4,7 @@ on:
   watch:
     types: [started] # combined with if: github.actor line allows me to kick of builds with stars
   schedule:
-    - cron: "0 * * * *"
+    - cron: "0 0 * * *"
 
 jobs:
   action:
