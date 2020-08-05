@@ -117,7 +117,7 @@ jobs:
 
           COUNT=1
 
-          for FLAG in $(hugo --help | grep "^\s*-.*"); do
+          for FLAG in $(./hugo --help | grep "^\s*-.*"); do
             FLAG=$(trim_left "${FLAG}")
 
             SHORT=${FLAG%%--*}
