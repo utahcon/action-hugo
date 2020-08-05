@@ -140,9 +140,9 @@ jobs:
             ((COUNT=COUNT+1))
           done
 
-          sed -e "s;%%INPUTS%%;${YML_INPUTS};" action.yml.tmp > action.yml.tmp
-          sed -e "s/%%version%%/${{ needs.version.outputs.version }}/" action.yml.tmp > action.yml.tmp
-          sed -e "s/%%ARGS%%/${YML_ARGS}/" action.yml.tmp > action.yml
+          sed -e "s;%%INPUTS%%;${YML_INPUTS};" action.yml.tmp > action.yml.tmp2
+          sed -e "s/%%version%%/${{ needs.version.outputs.version }}/" action.yml.tmp2 > action.yml.tmp3
+          sed -e "s/%%ARGS%%/${YML_ARGS}/" action.yml.tmp3 > action.yml
 
           sed -e "s/%%ENTRY%%/${ENTRY}/" entrypoint.sh.tmp > entrypoint.sh
 
