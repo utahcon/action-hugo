@@ -107,6 +107,11 @@ jobs:
       - run: chmod +x hugo
       - run: chmod +x entrypoint.sh
 
+      - name: Identify
+        run: |
+          git config --global user.email "github@utahcon.com"
+          git config --global user.name "Adam Barrett"
+
       - name: Create and commit action.yml
         run: |
           function trim_left {
