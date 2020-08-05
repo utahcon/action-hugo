@@ -20,7 +20,7 @@ jobs:
   hugo:
     name: Checkout and build Hugo
     runs-on: ubuntu-latest
-    needs: identify_version
+    needs: version
     steps:
       - name: Checkout hugo
         uses: actions/checkout@v2.3.1
