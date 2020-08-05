@@ -47,7 +47,9 @@ jobs:
   action:
     name: Checkout action-hugo
     runs-on: ubuntu-latest
-    needs: hugo
+    needs:
+      - hugo
+      - version
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
@@ -78,6 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - hugo
+      - version
     steps:
       - uses: actions/checkout@v2.3.1
         with:
