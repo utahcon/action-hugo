@@ -141,11 +141,11 @@ jobs:
             ((COUNT=COUNT+1))
           done
 
-          sed -e "s;%%INPUTS%%;${YML_INPUTS};" action.yml.tmp > action.yml.tmp2
-          sed -e "s/%%version%%/${{ needs.version.outputs.version }}/" action.yml.tmp2 > action.yml.tmp3
-          sed -e "s/%%ARGS%%/${YML_ARGS}/" action.yml.tmp3 > action.yml
+          sed -i "s;%%INPUTS%%;${YML_INPUTS};" action.yml
+          sed -i "s/%%VERSION%%/${{ needs.version.outputs.version }}/" action.yml
+          sed -i "s/%%ARGS%%/${YML_ARGS}/" action.yml
 
-          sed -e "s/%%ENTRY%%/${ENTRY}/" entrypoint.sh.tmp > entrypoint.sh
+          sed -i "s/%%ENTRY%%/${ENTRY}/" entrypoint.sh.tmp > entrypoint.sh
 
           git add action.yml entrypoint.sh
           git commit -m "Updating action.yml with version ${{ needs.version.outputs.version }}"
