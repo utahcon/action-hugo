@@ -107,62 +107,62 @@ jobs:
       - run: chmod +x hugo
       - run: chmod +x entrypoint.sh
 
-    - name: Create and commit action.yml
-      run: |
-        function trim_left {
-          # shellcheck disable=SC2001
-          echo "${1}" | sed -e "s/^\s*//"
-        }
+      - name: Create and commit action.yml
+        run: |
+          function trim_left {
+            # shellcheck disable=SC2001
+            echo "${1}" | sed -e "s/^\s*//"
+          }
 
-        YML_INPUTS=""
-        YML_ARGS=""
-        ENTRY=""
-        IFS=$'\n'
-        START="\$"
-        START+="{{"
-        END="}}"
+          YML_INPUTS=""
+          YML_ARGS=""
+          ENTRY=""
+          IFS=$'\n'
+          START="\$"
+          START+="{{"
+          END="}}"
 
-        COUNT=1
+          COUNT=1
 
-        for FLAG in $(hugo --help | grep "^\s*-.*"); do
-        #  echo -e "\n"
-          FLAG=$(trim_left "${FLAG}")
-        #  echo "'${FLAG}'"
+          for FLAG in $(hugo --help | grep "^\s*-.*"); do
+          #  echo -e "\n"
+            FLAG=$(trim_left "${FLAG}")
+          #  echo "'${FLAG}'"
 
-          # Get Short Flag
-          SHORT=${FLAG%%--*}
-          SHORT=$(trim_left "${SHORT}")
-        #  echo "Short:1:2 ${SHORT:1:1}"
-          FLAG=${FLAG#*--}
+            # Get Short Flag
+            SHORT=${FLAG%%--*}
+            SHORT=$(trim_left "${SHORT}")
+          #  echo "Short:1:2 ${SHORT:1:1}"
+            FLAG=${FLAG#*--}
 
-          # Get Long Flag
-          FLAG=$(trim_left "${FLAG}")
-          LONG=${FLAG%% *}
-          LONG=$(trim_left "${LONG}")
-        #  echo "Long: '${LONG}'"
+            # Get Long Flag
+            FLAG=$(trim_left "${FLAG}")
+            LONG=${FLAG%% *}
+            LONG=$(trim_left "${LONG}")
+          #  echo "Long: '${LONG}'"
 
-          FLAG=${FLAG#* }
-          ARG=${FLAG%% *}
-        #  echo "Arg: '${ARG}'"
+            FLAG=${FLAG#* }
+            ARG=${FLAG%% *}
+          #  echo "Arg: '${ARG}'"
 
-          FLAG=${FLAG#* }
-          DESC=$(trim_left "${FLAG}")
-        #  echo "Desc: '${DESC}'"
+            FLAG=${FLAG#* }
+            DESC=$(trim_left "${FLAG}")
+          #  echo "Desc: '${DESC}'"
 
-          YML_INPUTS+="\n  ${LONG}\:\n    description\: ${DESC}\n    required\: false"
-          YML_ARGS+="\n    - ${START} inputs.${LONG} ${END}"
-          ENTRY+="\n      ${COUNT}) ARGUMENTS+=\"--${LONG} \${1} \";;"
+            YML_INPUTS+="\n  ${LONG}\:\n    description\: ${DESC}\n    required\: false"
+            YML_ARGS+="\n    - ${START} inputs.${LONG} ${END}"
+            ENTRY+="\n      ${COUNT}) ARGUMENTS+=\"--${LONG} \${1} \";;"
 
-          ((COUNT=COUNT+1))
-        done
+            ((COUNT=COUNT+1))
+          done
 
-        sed -e "s;%%INPUTS%%;${YML_INPUTS};" action.yml.tmp > action.yml.tmp2
-        sed -e "s/%%ARGS%%/${YML_ARGS}/" action.yml.tmp2 > action.yml
-        sed -e "s/%%ENTRY%%/${ENTRY}/" entrypoint.sh.tmp > entrypoint.sh
+          sed -e "s;%%INPUTS%%;${YML_INPUTS};" action.yml.tmp > action.yml.tmp2
+          sed -e "s/%%ARGS%%/${YML_ARGS}/" action.yml.tmp2 > action.yml
+          sed -e "s/%%ENTRY%%/${ENTRY}/" entrypoint.sh.tmp > entrypoint.sh
 
-        git add action.yml entrypoint.sh
-        git commit -m "Updating action.yml with version ${{ steps.version.outputs.version }}"
-        git push
+          git add action.yml entrypoint.sh
+          git commit -m "Updating action.yml with version ${{ steps.version.outputs.version }}"
+          git push
 
       - uses: docker/build-push-action@v1.1.0
         with:
