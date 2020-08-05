@@ -167,7 +167,7 @@ jobs:
 
           git add action.yml entrypoint.sh
           git commit -m "Updating action.yml with version ${{ steps.version.outputs.version }}"
-          git push
+          git push origin release-${{ needs.checkout_action.outputs.version }}
 
       - uses: docker/build-push-action@v1.1.0
         with:
