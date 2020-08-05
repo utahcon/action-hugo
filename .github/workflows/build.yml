@@ -154,7 +154,7 @@ jobs:
         run: git tag -af ${{ needs.version.outputs.version }} -m "Version ${{ needs.version.outputs.version }}"
 
       - name: Push release branch and tags
-        run: git push origin release-${{ steps.version.outputs.version }} --tags --force
+        run: git push origin release-${{ needs.version.outputs.version }} --tags --force
 
       - uses: docker/build-push-action@v1.1.0
         with:
