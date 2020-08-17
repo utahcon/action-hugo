@@ -34,15 +34,23 @@ jobs:
         run: |
           (
             cd hugodir
+            git fetch --all
+            git tag | sort -V > hugo_versions
             git checkout ${{ needs.version.outputs.version }}
             go install --tags extended
           )
           mv $HOME/go/bin/hugo .
+          mv hugodir/hugo_versions .
 
       - uses: actions/upload-artifact@v2
         with:
           name: hugo
           path: hugo
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: hugo_versions
+          path: hugo_versions
 
   action:
     name: Checkout action-hugo
@@ -88,6 +96,11 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: hugo
+          path: .
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: hugo_versions
           path: .
 
       - run: chmod +x hugo
@@ -139,14 +152,26 @@ jobs:
             YML_ARGS+="\n    - ${START} inputs.${LONG} ${END}"
             ENTRY+="\n      ${COUNT}) ARGUMENTS+=\"--${LONG} \${1} \";;"
 
+            README_INPUTS+="\n| ${LONG} | ${ARG} | ${DESC} |"
+
             ((COUNT=COUNT+1))
           done
 
+          # build action.yml
           sed -i "s;%%INPUTS%%;${YML_INPUTS};" action.yml
           sed -i "s/%%VERSION%%/${{ needs.version.outputs.version }}/" action.yml
           sed -i "s/%%ARGS%%/${YML_ARGS}/" action.yml
 
           sed -i "s/%%ENTRY%%/${ENTRY}/" entrypoint.sh
+
+          for H_VERSION in $(cat hugo_versions); do
+            README_LINKS+="\n [${H_VERSION}](https://github.com/utahcon/action-hugo/tree/${H_VERSION})"
+          done
+
+          sed -i "s/%%LATEST%%/${{ needs.version.outputs.version }}/" README.md.tmp
+          sed -i "s/%%README_INPUTS%%/${README_INPUTS}/" README.md.tmp
+          sed -i "s/%%README_LINKS%%/${README_LINKS}/" README.md.tmp
+          mv README.md.tmp README.md
 
           chmod +x hugo
           chmod +x entrypoint.sh
@@ -167,4 +192,4 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
           repository: utahcon/hugo
           dockerfile: Containerfile
-          tags: ${{ needs.checkout_action.outputs.version }}
+          tags: ${{ needs.checkout_action.outputs.version }}, latest
