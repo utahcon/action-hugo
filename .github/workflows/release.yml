@@ -23,3 +23,13 @@ jobs:
           release_name: Release ${{ github.ref }}
           body: |
             Release for Hugo version ${{ github.ref }}
+
+      - name: Cleanup build branch
+          run: |
+            VERSION=$(cat BUILD_VERSION)
+
+            git config --global user.email "github@utahcon.com"
+            git config --global user.name "Adam Barrett"
+
+            git push origin :refs/tags/build-${VERSION} || true
+            git push origin :build-${VERSION} || true
