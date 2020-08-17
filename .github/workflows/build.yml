@@ -148,6 +148,9 @@ jobs:
 
           sed -i "s/%%ENTRY%%/${ENTRY}/" entrypoint.sh
 
+          chmod +x hugo
+          chmod +x entrypoint.sh
+
           git add action.yml entrypoint.sh
           git commit -m "Updating action.yml with version ${{ needs.version.outputs.version }}"
           git push origin release-${{ needs.version.outputs.version }}
