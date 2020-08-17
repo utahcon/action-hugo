@@ -164,7 +164,9 @@ jobs:
 
           sed -i "s/%%ENTRY%%/${ENTRY}/" entrypoint.sh
 
+          README_LINKS+=""
           for H_VERSION in $(cat hugo_versions); do
+            echo "\n [${H_VERSION}](https://github.com/utahcon/action-hugo/tree/${H_VERSION})"
             README_LINKS+="\n [${H_VERSION}](https://github.com/utahcon/action-hugo/tree/${H_VERSION})"
           done
 
