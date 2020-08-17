@@ -194,4 +194,4 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
           repository: utahcon/hugo
           dockerfile: Containerfile
-          tags: ${{ needs.checkout_action.outputs.version }}, latest
+          tags: ${{ needs.checkout_action.outputs.version }}
