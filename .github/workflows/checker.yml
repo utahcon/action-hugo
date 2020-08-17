@@ -55,6 +55,6 @@ jobs:
             git push origin :build || true
 
             git checkout -b build-${H_VERSION}
-            git commit -m "Kicking off build for ${H_VERSION}"
+            git commit -m "Build ${H_VERSION}"
             git push origin build-${H_VERSION} --force
           )
