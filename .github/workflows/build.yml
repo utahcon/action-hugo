@@ -133,8 +133,9 @@ jobs:
 
             FLAG=${FLAG#* }
             DESC=$(trim_left "${FLAG}")
+            DESC=$(echo $DESC | sed "s/'/\\\'/g")
 
-            YML_INPUTS+="\n  ${LONG}:\n    description: \"${DESC}\"\n    required: false"
+            YML_INPUTS+="\n  ${LONG}:\n    description: '${DESC}'\n    required: false"
             YML_ARGS+="\n    - ${START} inputs.${LONG} ${END}"
             ENTRY+="\n      ${COUNT}) ARGUMENTS+=\"--${LONG} \${1} \";;"
 
