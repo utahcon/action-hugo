@@ -170,8 +170,9 @@ jobs:
           done
 
           sed -i "s/%%LATEST%%/${{ needs.version.outputs.version }}/" README.md.tmp
-          sed -i "s/%%README_INPUTS%%/${README_INPUTS}/" README.md.tmp
+          #sed -i "s/%%README_INPUTS%%/${README_INPUTS}/" README.md.tmp
           sed -i "s/%%README_LINKS%%/${README_LINKS}/" README.md.tmp
+
           mv README.md.tmp README.md
 
           chmod +x hugo
