@@ -1,0 +1,32 @@
+%% workflow
+graph TD
+    %% triggers
+    subgraph triggers
+        push[/push::tags::v*\]
+    end
+
+    subgraph jobs
+        subgraph release
+            release_output{{version}}
+            release_step1[[actions::checkout]]
+            release_step2[[actions::create-release]]
+            release_step3[cleanup]
+
+            push --> release_step1
+
+            release_step1 --> release_step2
+            release_step2 --> release_step3
+            release_step3 --> release_output
+        end
+
+        subgraph master
+            master_needs>release::version]
+            master_step1[[actions::checkout]]
+            master_step2[update readme.md]
+
+            release_output --> master_needs
+
+            master_needs --> master_step1
+            master_step1 --> master_step2
+        end
+    end

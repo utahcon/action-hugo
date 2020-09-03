@@ -1,0 +1,57 @@
+graph TB
+				version_output{{version}}
+	subgraph events
+		push[/push\]
+		push --> version_1
+		push --> hugo_1
+		subgraph jobs
+			subgraph job_version["Get Build Version"]
+				version_1["version"]
+				version_output{{<br>version}}
+				version_1 --> version_output
+			end
+			subgraph job_hugo["Checkout and build Hugo"]
+				hugo_1["actions/checkout@v2.3.1"]
+				hugo_2["Build hugo"]
+				hugo_3["actions/upload-artifact@v2"]
+				hugo_4["actions/upload-artifact@v2"]
+				hugo_1 --> hugo_2
+				hugo_2 --> hugo_3
+				hugo_3 --> hugo_4
+			end
+			subgraph job_action["Checkout action-hugo"]
+				action_needs>version]
+				action_1["actions/checkout@v2.3.1"]
+				action_2["Fetch all"]
+				action_3["Remove conflicting tags"]
+				action_4["Remove conflicting branches"]
+				action_needs --> action_1
+				action_1 --> action_2
+				action_2 --> action_3
+				action_3 --> action_4
+			end
+			subgraph job_build_and_push_container["Build and push action-hugo container"]
+				build_and_push_container_needs>hugo<br>version<br>action]
+				build_and_push_container_1["actions/checkout@v2.3.1"]
+				build_and_push_container_2["actions/download-artifact@v2"]
+				build_and_push_container_3["actions/download-artifact@v2"]
+				build_and_push_container_4["chmod +x hugo"]
+				build_and_push_container_5["Identify"]
+				build_and_push_container_6["Create and checkout release branch"]
+				build_and_push_container_7["Create and commit action.yml"]
+				build_and_push_container_8["Create version tag"]
+				build_and_push_container_9["docker/build-push-action@v1.1.0"]
+				build_and_push_container_10["Push release branch and tags"]
+				build_and_push_container_needs --> build_and_push_container_1
+				build_and_push_container_1 --> build_and_push_container_2
+				build_and_push_container_2 --> build_and_push_container_3
+				build_and_push_container_3 --> build_and_push_container_4
+				build_and_push_container_4 --> build_and_push_container_5
+				build_and_push_container_5 --> build_and_push_container_6
+				build_and_push_container_6 --> build_and_push_container_7
+				build_and_push_container_7 --> build_and_push_container_8
+				build_and_push_container_8 --> build_and_push_container_9
+				build_and_push_container_9 --> build_and_push_container_10
+			end
+		end
+	end

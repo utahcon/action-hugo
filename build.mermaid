@@ -1,0 +1,77 @@
+graph TB
+    subgraph triggers
+        push[/"push::branches::build*"\]
+        push --> version_step1
+
+        subgraph jobs
+            subgraph job_version[version]
+                version_step1["version"]
+                version_output{{version}}
+
+                version_step1 --> version_output
+            end
+
+            subgraph job_hugo[hugo]
+                hugo_needs>version]
+                hugo_step1[checkout]
+                hugo_step2[build]
+                hugo_step3[upload-artifact::hugo]
+                hugo_step4[upload-artifact::hugo_versions]
+
+                version_output --> hugo_needs
+
+                hugo_needs --> hugo_step1
+                hugo_step1 --> hugo_step2
+                hugo_step2 --> hugo_step3
+                hugo_step3 --> hugo_step4
+            end
+
+            subgraph job_action[action]
+                action_needs>version]
+                action_step1[checkout]
+                action_step2[fetch --all]
+                action_step3[remove tags]
+                action_step4[remove branches]
+
+                version_output --> action_needs
+
+                action_needs --> action_step1
+                action_step1 --> action_step2
+                action_step2 --> action_step3
+                action_step3 --> action_step4
+            end
+
+            subgraph job_build_and_push_container
+                build_and_push_container_needs>hugo<br>action<br>version]
+                build_and_push_container_step1[checkout]
+                build_and_push_container_step2[download-artifact::hugo]
+                build_and_push_container_step3[download-artifact::hugo_versions]
+                build_and_push_container_step4[Identify]
+                build_and_push_container_step5[create release branch]
+                build_and_push_container_step6[action.yml]
+                build_and_push_container_step7[Create Version Tag]
+                build_and_push_container_step8[Docker Push]
+                build_and_push_container_step9[Push Release]
+
+                action_step4 --> build_and_push_container_needs
+                hugo_step4 --> build_and_push_container_needs
+
+                build_and_push_container_needs --> build_and_push_container_step1
+                build_and_push_container_step1 --> build_and_push_container_step2
+                build_and_push_container_step2 --> build_and_push_container_step3
+                build_and_push_container_step3 --> build_and_push_container_step4
+                build_and_push_container_step4 --> build_and_push_container_step5
+                build_and_push_container_step5 --> build_and_push_container_step6
+                build_and_push_container_step6 --> build_and_push_container_step7
+                build_and_push_container_step7 --> build_and_push_container_step8
+                build_and_push_container_step8 --> build_and_push_container_step9
+            end
+        end
+    end
+
+
+
+
+
+
+

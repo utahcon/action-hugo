@@ -42,6 +42,7 @@ jobs:
           mv $HOME/go/bin/hugo .
           mv hugodir/hugo_versions .
 
+
       - uses: actions/upload-artifact@v2
         with:
           name: hugo
@@ -56,8 +57,8 @@ jobs:
     name: Checkout action-hugo
     runs-on: ubuntu-latest
     needs:
-      - hugo
       - version
+
     steps:
       - name: Checkout action-hugo
         uses: actions/checkout@v2.3.1
@@ -185,9 +186,6 @@ jobs:
       - name: Create version tag
         run: git tag -af ${{ needs.version.outputs.version }} -m "Version ${{ needs.version.outputs.version }}"
 
-      - name: Push release branch and tags
-        run: git push origin release-${{ needs.version.outputs.version }} --tags --force
-
       - uses: docker/build-push-action@v1.1.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -195,3 +193,6 @@ jobs:
           repository: utahcon/hugo
           dockerfile: Containerfile
           tags: ${{ needs.checkout_action.outputs.version }}
+
+      - name: Push release branch and tags
+        run: git push origin release-${{ needs.version.outputs.version }} --tags --force
