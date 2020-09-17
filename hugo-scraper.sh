@@ -44,9 +44,18 @@ for FLAG in $(hugo --help | grep "^\s*-.*"); do
   YML_ARGS+="\n    - \${{ inputs.${LONG} }}"
   ENTRY+="\n      ${COUNT}) ARGUMENTS+=\"--${LONG} \${1} \";;"
 
+  README_INPUTS+="\n| ${LONG} | ${ARG} | ${DESC} |"
+
   ((COUNT=COUNT+1))
 done
 
-sed -e "s;%%INPUTS%%;${YML_INPUTS};" action.yml.tmp > action.yml.tmp2
-sed -e "s/%%ARGS%%/${YML_ARGS}/" action.yml.tmp2 > action.yml
-sed -e "s/%%ENTRY%%/${ENTRY}/" entrypoint.sh.tmp > entrypoint.sh
+VERSION=$(cat BUILD_VERSION)
+
+sed -i -e "s;%%INPUTS%%;${YML_INPUTS};" action.yml
+sed -i -e "s/%%ARGS%%/${YML_ARGS}/" action.yml
+sed -i -e "s/%%VERSION%%/${VERSION}/" action.yml
+
+sed -i -e "s/%%ENTRY%%/${ENTRY}/" entrypoint.sh
+
+sed -i -e "s;%%README_INPUTS%%;${README_INPUTS};" README.md
+sed -i -e "s/%%VERSION%%/${VERSION}/" action.yml

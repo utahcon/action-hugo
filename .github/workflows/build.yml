@@ -114,74 +114,17 @@ jobs:
       - name: Create and checkout release branch
         run: git checkout -b release-${{ needs.version.outputs.version }}
 
-      - name: Create and commit action.yml
+      - name: Run hugo-scraper
+        run: hugo-scraper.sh
+
+      - name: chmod hugo and entrypoint
         run: |
-          function trim_left {
-            # shellcheck disable=SC2001
-            echo "${1}" | sed -e "s/^\s*//"
-          }
-
-          YML_INPUTS=""
-          YML_ARGS=""
-          ENTRY=""
-          IFS=$'\n'
-          START="\$"
-          START+="{{"
-          END="}}"
-
-          COUNT=1
-
-          for FLAG in $(./hugo --help | grep "^\s*-.*"); do
-            FLAG=$(trim_left "${FLAG}")
-
-            SHORT=${FLAG%%--*}
-            SHORT=$(trim_left "${SHORT}")
-            FLAG=${FLAG#*--}
-
-            FLAG=$(trim_left "${FLAG}")
-            LONG=${FLAG%% *}
-            LONG=$(trim_left "${LONG}")
-
-            FLAG=${FLAG#* }
-            ARG=${FLAG%% *}
-
-            FLAG=${FLAG#* }
-            DESC=$(trim_left "${FLAG}")
-            DESC=$(echo $DESC | sed "s/'//g")
-
-            YML_INPUTS+="\n  ${LONG}:\n    description: '${DESC}'\n    required: false"
-            YML_ARGS+="\n    - ${START} inputs.${LONG} ${END}"
-            ENTRY+="\n      ${COUNT}) ARGUMENTS+=\"--${LONG} \${1} \";;"
-
-            README_INPUTS+="\n| ${LONG} | ${ARG} | ${DESC} |"
-
-            ((COUNT=COUNT+1))
-          done
-
-          # build action.yml
-          sed -i "s;%%INPUTS%%;${YML_INPUTS};" action.yml
-          sed -i "s/%%VERSION%%/${{ needs.version.outputs.version }}/" action.yml
-          sed -i "s/%%ARGS%%/${YML_ARGS}/" action.yml
-
-          sed -i "s/%%ENTRY%%/${ENTRY}/" entrypoint.sh
-
-          README_LINKS+=""
-          for H_VERSION in $(cat hugo_versions); do
-            README_LINKS+="\n [${H_VERSION}](https:\/\/github.com\/utahcon\/action-hugo\/tree\/${H_VERSION})"
-          done
-
-          sed -i "s/%%LATEST%%/${{ needs.version.outputs.version }}/" README.md.tmp
-          #sed -i "s/%%README_INPUTS%%/${README_INPUTS}/" README.md.tmp
-          sed -i "s/%%README_LINKS%%/${README_LINKS}/" README.md.tmp
-
-          mv README.md.tmp README.md
-
           chmod +x hugo
           chmod +x entrypoint.sh
 
-          git add action.yml entrypoint.sh
-          git commit -m "Updating action.yml with version ${{ needs.version.outputs.version }}"
-          git push origin release-${{ needs.version.outputs.version }}
+      - name: git add action.yml entrypoint.sh and README.md
+          git add action.yml entrypoint.sh README.md
+          git commit -m "Documentation for ${{ needs.version.outputs.version }}"
 
       - name: Create version tag
         run: git tag -af ${{ needs.version.outputs.version }} -m "Version ${{ needs.version.outputs.version }}"
