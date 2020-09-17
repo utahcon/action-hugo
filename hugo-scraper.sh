@@ -58,4 +58,4 @@ sed -i -e "s/%%VERSION%%/${VERSION}/" action.yml
 sed -i -e "s/%%ENTRY%%/${ENTRY}/" entrypoint.sh
 
 sed -i -e "s;%%README_INPUTS%%;${README_INPUTS};" README.md
-sed -i -e "s/%%VERSION%%/${VERSION}/" action.yml
+sed -i -e "s/%%VERSION%%/${VERSION}/" README.md
