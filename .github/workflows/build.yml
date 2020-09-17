@@ -114,13 +114,14 @@ jobs:
       - name: Create and checkout release branch
         run: git checkout -b release-${{ needs.version.outputs.version }}
 
+      - name: chmod hugo
+        run: chmod +x hugo
+
       - name: Run hugo-scraper
         run: ./hugo-scraper.sh
 
-      - name: chmod hugo and entrypoint
-        run: |
-          chmod +x hugo
-          chmod +x entrypoint.sh
+      - name: chmod entrypoint
+        run: chmod +x entrypoint.sh
 
       - name: commit action.yml entrypoint.sh and README.md
         run:
