@@ -15,7 +15,7 @@ IFS=$'\n'
 
 COUNT=1
 
-for FLAG in $(hugo --help | grep "^\s*-.*"); do
+for FLAG in $(./hugo --help | grep "^\s*-.*"); do
 #  echo -e "\n"
   FLAG=$(trim_left "${FLAG}")
 #  echo "'${FLAG}'"
