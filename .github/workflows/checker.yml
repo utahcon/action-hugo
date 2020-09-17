@@ -8,7 +8,6 @@ on:
 
 jobs:
   action:
-    if: github.actor == github.event.repository.owner.login
     name: Checkout action-hugo
     runs-on: ubuntu-latest
     steps:
