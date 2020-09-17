@@ -30,26 +30,9 @@ jobs:
         name: Cleanup build branch
         run: |
             VERSION=$(cat BUILD_VERSION)
-            echo "::set-output name=version::${VERSION}"
 
             git config --global user.email "github@utahcon.com"
             git config --global user.name "Adam Barrett"
 
             git push origin :refs/tags/build-${VERSION} || true
             git push origin :build-${VERSION} || true
-
-  master:
-    needs:
-      - release
-    name: Update master branch
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout master
-        uses: actions/checkout@v2.3.1
-        with:
-          ref: master
-          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-
-      - name: Update README.md
-        run: |
-
