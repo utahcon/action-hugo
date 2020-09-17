@@ -130,6 +130,14 @@ jobs:
       - name: Create version tag
         run: git tag -af ${{ needs.version.outputs.version }} -m "Version ${{ needs.version.outputs.version }}"
 
+      - name: Check latest tagging
+        run: |
+          HUGO_VERSION=$(curl https://api.github.com/repos/gohugoio/hugo/tags | jq -r .[0].name)
+          VERSION=${{ needs.version.outputs.version }}
+          if [ ${VERSION} == ${HUGO_VERSION} ]; then
+            git tag -af latest -m "Version ${{ needs.version.outputs.version }}"
+          fi
+
       - uses: docker/build-push-action@v1.1.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
