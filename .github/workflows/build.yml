@@ -192,7 +192,7 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
           repository: utahcon/hugo
           dockerfile: Containerfile
-          tags: ${{ needs.checkout_action.outputs.version }}
+          tags: ${{ needs.version.outputs.version }}
 
       - name: Push release branch and tags
         run: git push origin release-${{ needs.version.outputs.version }} --tags --force
