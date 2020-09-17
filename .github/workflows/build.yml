@@ -122,7 +122,8 @@ jobs:
           chmod +x hugo
           chmod +x entrypoint.sh
 
-      - name: git add action.yml entrypoint.sh and README.md
+      - name: commit action.yml entrypoint.sh and README.md
+        run:
           git add action.yml entrypoint.sh README.md
           git commit -m "Documentation for ${{ needs.version.outputs.version }}"
 
