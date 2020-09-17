@@ -124,7 +124,7 @@ jobs:
         run: chmod +x entrypoint.sh
 
       - name: commit action.yml entrypoint.sh and README.md
-        run:
+        run: |
           git add action.yml entrypoint.sh README.md
           git commit -m "Documentation for ${{ needs.version.outputs.version }}"
 
