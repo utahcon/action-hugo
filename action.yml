@@ -6,9 +6,161 @@ branding:
   icon: package
   color: orange
 
-inputs: %%INPUTS%%
+inputs: 
+  baseURL:
+    description: hostname (and path) to the root, e.g. http://spf13.com/
+    required: false
+  buildDrafts:
+    description: include content marked as draft
+    required: false
+  buildExpired:
+    description: include expired content
+    required: false
+  buildFuture:
+    description: include content with publishdate in the future
+    required: false
+  cacheDir:
+    description: filesystem path to cache directory. Defaults: $TMPDIR/hugo_cache/
+    required: false
+  cleanDestinationDir:
+    description: remove files from destination not found in static directories
+    required: false
+  config:
+    description: config file (default is path/config.yaml|json|toml)
+    required: false
+  configDir:
+    description: config dir (default "config")
+    required: false
+  contentDir:
+    description: filesystem path to content directory
+    required: false
+  debug:
+    description: debug output
+    required: false
+  destination:
+    description: filesystem path to write files to
+    required: false
+  disableKinds:
+    description: disable different kind of pages (home, RSS etc.)
+    required: false
+  enableGitInfo:
+    description: add Git revision, date and author info to the pages
+    required: false
+  environment:
+    description: build environment
+    required: false
+  forceSyncStatic:
+    description: copy all files when static is changed.
+    required: false
+  gc:
+    description: enable to run some cleanup tasks (remove unused cache files) after the build
+    required: false
+  help:
+    description: help for hugo
+    required: false
+  i18n-warnings:
+    description: print missing translations
+    required: false
+  ignoreCache:
+    description: ignores the cache directory
+    required: false
+  ignoreVendor:
+    description: ignores any _vendor directory
+    required: false
+  layoutDir:
+    description: filesystem path to layout directory
+    required: false
+  log:
+    description: enable Logging
+    required: false
+  logFile:
+    description: log File path (if set, logging enabled automatically)
+    required: false
+  minify:
+    description: minify any supported output format (HTML, XML etc.)
+    required: false
+  noChmod:
+    description: don't sync permission mode of files
+    required: false
+  noTimes:
+    description: don't sync modification time of files
+    required: false
+  path-warnings:
+    description: print warnings on duplicate target paths etc.
+    required: false
+  quiet:
+    description: build in quiet mode
+    required: false
+  renderToMemory:
+    description: render to memory (only useful for benchmark testing)
+    required: false
+  source:
+    description: filesystem path to read files relative from
+    required: false
+  templateMetrics:
+    description: display metrics about template executions
+    required: false
+  templateMetricsHints:
+    description: calculate some improvement hints when combined with --templateMetrics
+    required: false
+  theme:
+    description: themes to use (located in /themes/THEMENAME/)
+    required: false
+  themesDir:
+    description: filesystem path to themes directory
+    required: false
+  trace:
+    description: write trace to file (not useful in general)
+    required: false
+  verbose:
+    description: verbose output
+    required: false
+  verboseLog:
+    description: verbose logging
+    required: false
+  watch:
+    description: watch filesystem for changes and recreate as needed
+    required: false
 
 runs:
   using: docker
-  image: docker://utahcon/hugo:%%VERSION%%
-  args: %%ARGS%%
+  image: docker://utahcon/hugo:v0.59.0
+  args: 
+    - ${{ inputs.baseURL }}
+    - ${{ inputs.buildDrafts }}
+    - ${{ inputs.buildExpired }}
+    - ${{ inputs.buildFuture }}
+    - ${{ inputs.cacheDir }}
+    - ${{ inputs.cleanDestinationDir }}
+    - ${{ inputs.config }}
+    - ${{ inputs.configDir }}
+    - ${{ inputs.contentDir }}
+    - ${{ inputs.debug }}
+    - ${{ inputs.destination }}
+    - ${{ inputs.disableKinds }}
+    - ${{ inputs.enableGitInfo }}
+    - ${{ inputs.environment }}
+    - ${{ inputs.forceSyncStatic }}
+    - ${{ inputs.gc }}
+    - ${{ inputs.help }}
+    - ${{ inputs.i18n-warnings }}
+    - ${{ inputs.ignoreCache }}
+    - ${{ inputs.ignoreVendor }}
+    - ${{ inputs.layoutDir }}
+    - ${{ inputs.log }}
+    - ${{ inputs.logFile }}
+    - ${{ inputs.minify }}
+    - ${{ inputs.noChmod }}
+    - ${{ inputs.noTimes }}
+    - ${{ inputs.path-warnings }}
+    - ${{ inputs.quiet }}
+    - ${{ inputs.renderToMemory }}
+    - ${{ inputs.source }}
+    - ${{ inputs.templateMetrics }}
+    - ${{ inputs.templateMetricsHints }}
+    - ${{ inputs.theme }}
+    - ${{ inputs.themesDir }}
+    - ${{ inputs.trace }}
+    - ${{ inputs.verbose }}
+    - ${{ inputs.verboseLog }}
+    - ${{ inputs.watch }}
