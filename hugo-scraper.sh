@@ -3,7 +3,7 @@ set -euo pipefail
 # scrape the help info from Hugo to create better action.yml and entrypoint.sh
 
 # left trimming!
-function trim_left {
+function trim_left() {
   # shellcheck disable=SC2001
   echo "${1}" | sed -e "s/^\s*//"
 }
@@ -16,37 +16,43 @@ IFS=$'\n'
 COUNT=1
 
 for FLAG in $(./hugo --help | grep "^\s*-.*"); do
-#  echo -e "\n"
+  #  echo -e "\n"
   FLAG=$(trim_left "${FLAG}")
-#  echo "'${FLAG}'"
+  #  echo "'${FLAG}'"
 
   # Get Short Flag
   SHORT=${FLAG%%--*}
   SHORT=$(trim_left "${SHORT}")
-#  echo "Short:1:2 ${SHORT:1:1}"
+  #  echo "Short:1:2 ${SHORT:1:1}"
   FLAG=${FLAG#*--}
 
   # Get Long Flag
   FLAG=$(trim_left "${FLAG}")
   LONG=${FLAG%% *}
   LONG=$(trim_left "${LONG}")
-#  echo "Long: '${LONG}'"
+  #  echo "Long: '${LONG}'"
 
   FLAG=${FLAG#* }
   ARG=${FLAG%% *}
-#  echo "Arg: '${ARG}'"
+  #  echo "Arg: '${ARG}'"
 
   FLAG=${FLAG#* }
   DESC=$(trim_left "${FLAG}")
-#  echo "Desc: '${DESC}'"
+  # shellcheck disable=SC2001
+  if [[ "${DESC}" == *'"'* ]]; then
+    echo "contains quotes"
+    DESC=$(echo $DESC | sed -e 's/"//g' )
+    DESC="${DESC#\"}"
+  fi
+  echo "Desc: '${DESC}'"
 
-  YML_INPUTS+="\n  ${LONG}\:\n    description\: ${DESC}\n    required\: false"
+  YML_INPUTS+="\n  ${LONG}\:\n    description\: \"${DESC}\"\n    required\: false"
   YML_ARGS+="\n    - \${{ inputs.${LONG} }}"
   ENTRY+="\n      ${COUNT}) ARGUMENTS+=\"--${LONG} \${1} \";;"
 
   README_INPUTS+="\n| ${LONG} | ${ARG} | ${DESC} |"
 
-  ((COUNT=COUNT+1))
+  ((COUNT = COUNT + 1))
 done
 
 VERSION=$(cat BUILD_VERSION)
