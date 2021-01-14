@@ -7,6 +7,10 @@ The world’s fastest framework for building websites now has a Github Action th
  
 You can even leverage them without Github Actions: [see here](https://hub.docker.com/r/utahcon/hugo)
 
+## Hugo Modules support added in v0.80.0
+
+Starting with `action-hugo` v0.80.0 you can now use [Hugo Modules](https://gohugo.io/hugo-modules/). Enjoy!
+
 ## Usage
 Simple to use, just add a step to your workflow as follows:
 
