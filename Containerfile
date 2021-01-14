@@ -1,7 +1,7 @@
 FROM archlinux:latest
 
 RUN pacman -Syu --noconfirm
-RUN pacman -S --noconfirm go
+RUN pacman -S --noconfirm go git
 
 # Copy Hugo Binary into place (Specific to Github runners)
 COPY hugo hugo
