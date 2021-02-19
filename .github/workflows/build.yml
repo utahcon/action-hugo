@@ -27,7 +27,7 @@ jobs:
           mkdir golang
           cd golang
           wget https://golang.org/dl/go1.16.linux-amd64.tar.gz
-          tar -xvfz go1.16.linux-amd64.tar.gz
+          tar -xzf go1.16.linux-amd64.tar.gz
           ./go version
       - name: Checkout hugo
         uses: actions/checkout@v2.3.1
