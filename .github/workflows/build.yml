@@ -24,9 +24,6 @@ jobs:
     steps:
       - name: Install Golang 1.16
         run: |
-#          wget https://golang.org/dl/go1.16.linux-amd64.tar.gz
-#          tar -C /usr/local -xzf go1.16.linux-amd64.tar.gz
-#          export PATH=$PATH:/usr/local/go/bin
           go version
       - name: Checkout hugo
         uses: actions/checkout@v2.3.1
