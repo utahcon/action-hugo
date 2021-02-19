@@ -24,12 +24,11 @@ jobs:
     steps:
       - name: Install Golang 1.16
         run: |
-          gobin=$(which go)
+          echo $PATH
           mkdir golang
           cd golang
           wget https://golang.org/dl/go1.16.linux-amd64.tar.gz
           tar -xzf go1.16.linux-amd64.tar.gz
-          mv go/bin/go $gobin
           ./go/bin/go version
       - name: Checkout hugo
         uses: actions/checkout@v2.3.1
