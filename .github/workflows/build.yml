@@ -30,7 +30,6 @@ jobs:
           wget https://golang.org/dl/go1.16.linux-amd64.tar.gz
           tar -xzf go1.16.linux-amd64.tar.gz
           export PATH=$(pwd)/go/bin:$PATH
-          echo $PATH
           go version
 
       - name: Checkout hugo
@@ -43,9 +42,7 @@ jobs:
 
       - name: Build hugo
         run: |
-          echo $PATH
-          export PATH=$(pwd)/go/bin:$PATH
-          echo $PATH
+          export PATH=$(pwd)/golang/go/bin:$PATH
           go version
           (
             cd hugodir
