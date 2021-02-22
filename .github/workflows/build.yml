@@ -49,6 +49,7 @@ jobs:
             git fetch --all
             git tag | sort -V > hugo_versions
             git checkout ${{ needs.version.outputs.version }}
+            go version
             go install --tags extended
           )
           mv $HOME/go/bin/hugo .
