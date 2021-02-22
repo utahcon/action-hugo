@@ -22,15 +22,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: version
     steps:
-      - name: Install Golang 1.16
+      - name: Shore up Ubuntu
         run: |
-          echo $PATH
-          mkdir golang
-          cd golang
-          wget https://golang.org/dl/go1.16.linux-amd64.tar.gz
-          tar -xzf go1.16.linux-amd64.tar.gz
-          export PATH=$(pwd)/go/bin:$PATH
-          go version
+          apt-get update
 
       - name: Checkout hugo
         uses: actions/checkout@v2.3.1
@@ -42,14 +36,11 @@ jobs:
 
       - name: Build hugo
         run: |
-          export PATH=$(pwd)/golang/go/bin:$PATH
-          go version
           (
             cd hugodir
             git fetch --all
             git tag | sort -V > hugo_versions
             git checkout ${{ needs.version.outputs.version }}
-            go version
             go install --tags extended
           )
           mv $HOME/go/bin/hugo .
