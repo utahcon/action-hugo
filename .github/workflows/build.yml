@@ -25,8 +25,11 @@ jobs:
       - name: Grab Golang 1.16
         run: |
           sudo add-apt-repository ppa:longsleep/golang-backports
+          sudo apt list --installed | grep golang
+          sudo apt remove golang-go
           sudo apt update
           sudo apt install golang-go
+          sudo apt update
           go version
 
       - name: Checkout hugo
