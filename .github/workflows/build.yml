@@ -39,6 +39,7 @@ jobs:
 
       - name: Build hugo
         run: |
+          go version
           (
             cd hugodir
             git fetch --all
