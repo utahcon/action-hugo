@@ -48,12 +48,12 @@ jobs:
           mv $HOME/go/bin/hugo .
           mv hugodir/hugo_versions .
 
-      - uses: actions/upload-artifact@v4.1.4
+      - uses: actions/upload-artifact@v4.3.1
         with:
           name: hugo
           path: hugo
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4.3.1
         with:
           name: hugo_versions
           path: hugo_versions
