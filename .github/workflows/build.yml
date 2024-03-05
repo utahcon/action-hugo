@@ -43,7 +43,7 @@ jobs:
         run: |
           curl -L https://github.com/gohugoio/hugo/releases/download/v${{ needs.version.outputs.version }}/hugo_extended_${{ needs.version.outputs.version }}_linux-amd64.tar.gz --output hugo.tgz
           tar xf hugo.tgz
-          chmod +x uhugo
+          chmod +x hugo
 
       - name: Identify
         run: |
