@@ -1,6 +1,7 @@
 name: Check hugo version
 
 on:
+  workflow_dispatch:
   watch:
     types: [started] # combined with if: github.actor line allows me to kick of builds with stars
   schedule:

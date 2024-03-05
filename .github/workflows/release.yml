@@ -1,6 +1,7 @@
 name: Release action-hugo
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v*'
