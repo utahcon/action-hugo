@@ -49,7 +49,7 @@ jobs:
 
       - name: Download Hugo binary
         run: |
-          curl -L https://github.com/gohugoio/hugo/releases/download/v${{ needs.version.outputs.version }}/hugo_extended_${VERSION#*v}_Linux-64bit.tar.gz --output hugo.tgz
+          curl -L https://github.com/gohugoio/hugo/releases/download/v${{ needs.version.outputs.version }}/hugo_extended_${{ needs.version.outputs.version }}_Linux-64bit.tar.gz --output hugo.tgz
           tar xf hugo.tgz
           chmod +x hugo
 
