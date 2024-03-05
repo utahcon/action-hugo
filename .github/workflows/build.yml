@@ -24,10 +24,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: version
     steps:
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.22'
-
       - name: Checkout hugo
         uses: actions/checkout@v4.1.1
         with:
@@ -35,6 +31,10 @@ jobs:
           repository: gohugoio/hugo
           submodules: true
           fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
 
       - name: Build hugo
         run: |
