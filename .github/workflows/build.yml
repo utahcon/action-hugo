@@ -15,10 +15,10 @@ jobs:
     steps:
       - id: version
         run: |
-          echo "Github Ref: ${{ github.ref }}"
           VERSION=${{ github.ref }}
-          echo "Version: ${VERSION#*-}"
-          echo "version=${VERSION#*-}" >> $GITHUB_OUTPUT
+          VERSION=${VERSION#*-}
+          VERSION=${VERSION#*v}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
   build_and_push_container:
     name: Build and push action-hugo container
@@ -37,19 +37,19 @@ jobs:
         run: |
           for T in $(git tag); do
             if [ "${T}" == "${{ needs.version.outputs.version }}" ]; then
-              git push origin :refs/tags/${{ needs.version.outputs.version }}
+              git push origin :refs/tags/v${{ needs.version.outputs.version }}
             fi
           done
           
           for B in $(git branch -r); do
             if [ "${B}" == "origin/release-${{ needs.version.outputs.version }}" ]; then
-              git push origin :release-${{ needs.version.outputs.version }}
+              git push origin :release-v${{ needs.version.outputs.version }}
             fi
           done
 
       - name: Download Hugo binary
         run: |
-          curl -L https://github.com/gohugoio/hugo/releases/download/${{ needs.version.outputs.version }}/hugo_extended_${VERSION#*v}_Linux-64bit.tar.gz --output hugo.tgz
+          curl -L https://github.com/gohugoio/hugo/releases/download/v${{ needs.version.outputs.version }}/hugo_extended_${VERSION#*v}_Linux-64bit.tar.gz --output hugo.tgz
           tar xf hugo.tgz
           chmod +x hugo
 
@@ -59,7 +59,7 @@ jobs:
           git config --global user.name "Adam Barrett"
 
       - name: Create and checkout release branch
-        run: git checkout -b release-${{ needs.version.outputs.version }}
+        run: git checkout -b release-v${{ needs.version.outputs.version }}
 
       - name: Run hugo-scraper
         run: ./hugo-scraper.sh
@@ -70,17 +70,17 @@ jobs:
       - name: commit action.yml entrypoint.sh and README.md
         run: |
           git add action.yml entrypoint.sh README.md
-          git commit -m "Documentation for ${{ needs.version.outputs.version }}"
+          git commit -m "Documentation for v${{ needs.version.outputs.version }}"
 
       - name: Create version tag
-        run: git tag -af ${{ needs.version.outputs.version }} -m "Version ${{ needs.version.outputs.version }}"
+        run: git tag -af v${{ needs.version.outputs.version }} -m "Version v${{ needs.version.outputs.version }}"
 
       - name: Check latest tagging
         run: |
           HUGO_VERSION=$(curl https://api.github.com/repos/gohugoio/hugo/tags | jq -r .[0].name)
-          VERSION=${{ needs.version.outputs.version }}
+          VERSION=v${{ needs.version.outputs.version }}
           if [ ${VERSION} == ${HUGO_VERSION} ]; then
-            git tag -af latest -m "Version ${{ needs.version.outputs.version }}"
+            git tag -af latest -m "Version v${{ needs.version.outputs.version }}"
           fi
 
       - name: Set up Docker Buildx
@@ -95,7 +95,7 @@ jobs:
       - uses: docker/build-push-action@v5.1.0
         with:
           file: Containerfile
-          tags: ${{ needs.version.outputs.version }}
+          tags: v${{ needs.version.outputs.version }}
 
       - name: Push release branch and tags
-        run: git push origin release-${{ needs.version.outputs.version }} --tags --force
+        run: git push origin release-v${{ needs.version.outputs.version }} --tags --force
