@@ -20,79 +20,10 @@ jobs:
           echo "Version: ${VERSION#*-}"
           echo "version=${VERSION#*-}" >> $GITHUB_OUTPUT
 
-  hugo:
-    name: Checkout and build Hugo
-    runs-on: ubuntu-latest
-    needs: version
-    steps:
-      - name: Checkout hugo
-        uses: actions/checkout@v4.1.1
-        with:
-          path: hugodir
-          repository: gohugoio/hugo
-          submodules: true
-          fetch-depth: 0
-
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '^1.22'
-
-      - name: Build hugo
-        run: |
-          go version
-          (
-            cd hugodir
-            git fetch --all
-            git tag | sort -V > hugo_versions
-            git checkout ${{ needs.version.outputs.version }}
-            go install --tags extended
-          )
-          mv $HOME/go/bin/hugo .
-          mv hugodir/hugo_versions .
-
-      - uses: actions/upload-artifact@v4.3.1
-        with:
-          name: hugo
-          path: hugo
-
-      - uses: actions/upload-artifact@v4.3.1
-        with:
-          name: hugo_versions
-          path: hugo_versions
-
-#  action:
-#    name: Checkout action-hugo
-#    runs-on: ubuntu-latest
-#    needs: version
-#
-#    steps:
-#      - name: Checkout action-hugo
-#        uses: actions/checkout@v4.1.1
-#
-#      - name: Fetch all
-#        run: git fetch --all
-#
-#      - name: Remove conflicting tags
-#        run: |
-#          for T in $(git tag); do
-#            if [ "${T}" == "${{ needs.version.outputs.version }}" ]; then
-#              git push origin :refs/tags/${{ needs.version.outputs.version }}
-#            fi
-#          done
-#
-#      - name: Remove conflicting branches
-#        run: |
-#          for B in $(git branch -r); do
-#            if [ "${B}" == "origin/release-${{ needs.version.outputs.version }}" ]; then
-#              git push origin :release-${{ needs.version.outputs.version }}
-#            fi
-#          done
-
   build_and_push_container:
     name: Build and push action-hugo container
     runs-on: ubuntu-latest
     needs:
-      - hugo
       - version
     steps:
       - uses: actions/checkout@v4.1.1
@@ -118,19 +49,9 @@ jobs:
 
       - name: Download Hugo binary
         run: |
-          curl -L https://github.com/gohugoio/hugo/releases/download/v0.123.7/hugo_extended_0.123.7_Linux-64bit.tar.gz
-
-      - uses: actions/download-artifact@v4.1.4
-        with:
-          name: hugo
-          path: .
-
-      - uses: actions/download-artifact@v4.1.4
-        with:
-          name: hugo_versions
-          path: .
-
-      - run: chmod +x hugo
+          curl -L https://github.com/gohugoio/hugo/releases/download/${{ needs.version.outputs.version }}/hugo_extended_${VERSION#*v}_Linux-64bit.tar.gz --output hugo.tgz
+          tar xf hugo.tgz
+          chmod +x hugo
 
       - name: Identify
         run: |
@@ -139,9 +60,6 @@ jobs:
 
       - name: Create and checkout release branch
         run: git checkout -b release-${{ needs.version.outputs.version }}
-
-      - name: chmod hugo
-        run: chmod +x hugo
 
       - name: Run hugo-scraper
         run: ./hugo-scraper.sh
