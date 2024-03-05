@@ -91,6 +91,7 @@ jobs:
         with:
           no-cache: true
           file: Containerfile
+          context: .
           tags: utahcon/hugo:v${{ needs.version.outputs.version }}
           push: true
 
