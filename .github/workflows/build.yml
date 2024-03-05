@@ -34,7 +34,9 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '^1.22'
+          cache-dependency-path: |
+            hugo/go.sum
 
       - name: Build hugo
         run: |
