@@ -15,6 +15,7 @@ jobs:
     steps:
       - id: version
         run: |
+          echo "Github Ref: ${{ github.ref }}"
           VERSION=${{ github.ref }}
           echo "::set-output name=version::${VERSION#*-}"
 
