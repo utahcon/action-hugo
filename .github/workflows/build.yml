@@ -86,8 +86,10 @@ jobs:
 
       - uses: docker/build-push-action@v5.1.0
         with:
+          no-cache: true
           file: Containerfile
           tags: v${{ needs.version.outputs.version }}
+          push: true
 
       - name: Push release branch and tags
         run: git push origin release-v${{ needs.version.outputs.version }} --tags --force
