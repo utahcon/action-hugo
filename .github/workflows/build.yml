@@ -74,6 +74,8 @@ jobs:
           if [ ${VERSION} == ${HUGO_VERSION} ]; then
             git tag -af latest -m "Version v${{ needs.version.outputs.version }}"
           fi
+          
+          ls -al
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
