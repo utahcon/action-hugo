@@ -35,21 +35,13 @@ jobs:
 
       - name: Remove conflicting tags/branches
         run: |
-          for T in $(git tag); do
-            if [ "${T}" == "${{ needs.version.outputs.version }}" ]; then
-              git push origin :refs/tags/v${{ needs.version.outputs.version }}
-            fi
-          done
+          for T in $(git tag); do if [ "${T}" == "${{ needs.version.outputs.version }}" ]; then git push origin :refs/tags/v${{ needs.version.outputs.version }}; fi; done
           
-          for B in $(git branch -r); do
-            if [ "${B}" == "origin/release-${{ needs.version.outputs.version }}" ]; then
-              git push origin :release-v${{ needs.version.outputs.version }}
-            fi
-          done
+          for B in $(git branch -r); do if [ "${B}" == "origin/release-${{ needs.version.outputs.version }}" ]; then git push origin :release-v${{ needs.version.outputs.version }}; fi; done
 
       - name: Download Hugo binary
         run: |
-          curl -L https://github.com/gohugoio/hugo/releases/download/v${{ needs.version.outputs.version }}/hugo_extended_${{ needs.version.outputs.version }}_Linux-64bit.tar.gz --output hugo.tgz
+          curl -L https://github.com/gohugoio/hugo/releases/download/v${{ needs.version.outputs.version }}/hugo_extended_${{ needs.version.outputs.version }}_linux-amd64.tar.gz --output hugo.tgz
           tar xf hugo.tgz
           chmod +x hugo
 
