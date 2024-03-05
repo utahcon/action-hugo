@@ -2,6 +2,9 @@
 set -euo pipefail
 # scrape the help info from Hugo to create better action.yml and entrypoint.sh
 
+VERSION=$1
+echo "Scraping for version ${VERSION}"
+
 # left trimming!
 function trim_left() {
   # shellcheck disable=SC2001
@@ -54,8 +57,6 @@ for FLAG in $(./hugo --help | grep "^\s*-.*"); do
 
   ((COUNT = COUNT + 1))
 done
-
-VERSION=$(cat BUILD_VERSION)
 
 sed -i -e "s;%%INPUTS%%;${YML_INPUTS};" action.yml
 sed -i -e "s/%%ARGS%%/${YML_ARGS}/" action.yml

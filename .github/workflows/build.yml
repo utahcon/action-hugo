@@ -43,7 +43,7 @@ jobs:
         run: |
           curl -L https://github.com/gohugoio/hugo/releases/download/v${{ needs.version.outputs.version }}/hugo_extended_${{ needs.version.outputs.version }}_linux-amd64.tar.gz --output hugo.tgz
           tar xf hugo.tgz
-          chmod +x hugo
+          chmod +x uhugo
 
       - name: Identify
         run: |
@@ -54,7 +54,7 @@ jobs:
         run: git checkout -b release-v${{ needs.version.outputs.version }}
 
       - name: Run hugo-scraper
-        run: ./hugo-scraper.sh
+        run: ./hugo-scraper.sh v${VERSION}
 
       - name: chmod entrypoint
         run: chmod +x entrypoint.sh
