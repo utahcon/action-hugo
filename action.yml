@@ -10,5 +10,5 @@ inputs: %%INPUTS%%
 
 runs:
   using: docker
-  image: docker://utahcon/hugo:%%VERSION%%
+  image: docker://utahcon/hugo:v%%VERSION%%
   args: %%ARGS%%
