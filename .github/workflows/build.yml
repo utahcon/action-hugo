@@ -99,7 +99,7 @@ jobs:
         with:
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: hugo
           path: .
