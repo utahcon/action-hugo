@@ -6,9 +6,177 @@ branding:
   icon: package
   color: orange
 
-inputs: %%INPUTS%%
+inputs: 
+  baseURL:
+    description: "hostname (and path) to the root, e.g. https://spf13.com/"
+    required: false
+  buildDrafts:
+    description: "include content marked as draft"
+    required: false
+  buildExpired:
+    description: "include expired content"
+    required: false
+  buildFuture:
+    description: "include content with publishdate in the future"
+    required: false
+  cacheDir:
+    description: "filesystem path to cache directory"
+    required: false
+  cleanDestinationDir:
+    description: "remove files from destination not found in static directories"
+    required: false
+  clock:
+    description: "set the clock used by Hugo, e.g. --clock 2021-11-06T22:30:00.00+09:00"
+    required: false
+  config:
+    description: "config file (default is hugo.yaml|json|toml)"
+    required: false
+  configDir:
+    description: "config dir (default config)"
+    required: false
+  contentDir:
+    description: "filesystem path to content directory"
+    required: false
+  debug:
+    description: "debug output"
+    required: false
+  destination:
+    description: "filesystem path to write files to"
+    required: false
+  disableKinds:
+    description: "disable different kind of pages (home, RSS etc.)"
+    required: false
+  enableGitInfo:
+    description: "add Git revision, date, author, and CODEOWNERS info to the pages"
+    required: false
+  environment:
+    description: "build environment"
+    required: false
+  forceSyncStatic:
+    description: "copy all files when static is changed."
+    required: false
+  gc:
+    description: "enable to run some cleanup tasks (remove unused cache files) after the build"
+    required: false
+  help:
+    description: "help for hugo"
+    required: false
+  ignoreCache:
+    description: "ignores the cache directory"
+    required: false
+  ignoreVendorPaths:
+    description: "ignores any _vendor for module paths matching the given Glob pattern"
+    required: false
+  layoutDir:
+    description: "filesystem path to layout directory"
+    required: false
+  logLevel:
+    description: "log level (debug|info|warn|error)"
+    required: false
+  minify:
+    description: "minify any supported output format (HTML, XML etc.)"
+    required: false
+  noBuildLock:
+    description: "don't create .hugo_build.lock file"
+    required: false
+  noChmod:
+    description: "don't sync permission mode of files"
+    required: false
+  noTimes:
+    description: "don't sync modification time of files"
+    required: false
+  panicOnWarning:
+    description: "panic on first WARNING log"
+    required: false
+  poll:
+    description: "set this to a poll interval, e.g --poll 700ms, to use a poll based approach to watch for file system changes"
+    required: false
+  printI18nWarnings:
+    description: "print missing translations"
+    required: false
+  printMemoryUsage:
+    description: "print memory usage to screen at intervals"
+    required: false
+  printPathWarnings:
+    description: "print warnings on duplicate target paths etc."
+    required: false
+  printUnusedTemplates:
+    description: "print warnings on unused templates."
+    required: false
+  quiet:
+    description: "build in quiet mode"
+    required: false
+  renderToMemory:
+    description: "render to memory (mostly useful when running the server)"
+    required: false
+  source:
+    description: "filesystem path to read files relative from"
+    required: false
+  templateMetrics:
+    description: "display metrics about template executions"
+    required: false
+  templateMetricsHints:
+    description: "calculate some improvement hints when combined with --templateMetrics"
+    required: false
+  theme:
+    description: "themes to use (located in /themes/THEMENAME/)"
+    required: false
+  themesDir:
+    description: "filesystem path to themes directory"
+    required: false
+  trace:
+    description: "write trace to file (not useful in general)"
+    required: false
+  verbose:
+    description: "verbose output"
+    required: false
+  watch:
+    description: "watch filesystem for changes and recreate as needed"
+    required: false
 
 runs:
   using: docker
-  image: docker://utahcon/hugo:v%%VERSION%%
-  args: %%ARGS%%
+  image: docker://utahcon/hugo:v0.123.8
+  args: 
+    - ${{ inputs.baseURL }}
+    - ${{ inputs.buildDrafts }}
+    - ${{ inputs.buildExpired }}
+    - ${{ inputs.buildFuture }}
+    - ${{ inputs.cacheDir }}
+    - ${{ inputs.cleanDestinationDir }}
+    - ${{ inputs.clock }}
+    - ${{ inputs.config }}
+    - ${{ inputs.configDir }}
+    - ${{ inputs.contentDir }}
+    - ${{ inputs.debug }}
+    - ${{ inputs.destination }}
+    - ${{ inputs.disableKinds }}
+    - ${{ inputs.enableGitInfo }}
+    - ${{ inputs.environment }}
+    - ${{ inputs.forceSyncStatic }}
+    - ${{ inputs.gc }}
+    - ${{ inputs.help }}
+    - ${{ inputs.ignoreCache }}
+    - ${{ inputs.ignoreVendorPaths }}
+    - ${{ inputs.layoutDir }}
+    - ${{ inputs.logLevel }}
+    - ${{ inputs.minify }}
+    - ${{ inputs.noBuildLock }}
+    - ${{ inputs.noChmod }}
+    - ${{ inputs.noTimes }}
+    - ${{ inputs.panicOnWarning }}
+    - ${{ inputs.poll }}
+    - ${{ inputs.printI18nWarnings }}
+    - ${{ inputs.printMemoryUsage }}
+    - ${{ inputs.printPathWarnings }}
+    - ${{ inputs.printUnusedTemplates }}
+    - ${{ inputs.quiet }}
+    - ${{ inputs.renderToMemory }}
+    - ${{ inputs.source }}
+    - ${{ inputs.templateMetrics }}
+    - ${{ inputs.templateMetricsHints }}
+    - ${{ inputs.theme }}
+    - ${{ inputs.themesDir }}
+    - ${{ inputs.trace }}
+    - ${{ inputs.verbose }}
+    - ${{ inputs.watch }}
