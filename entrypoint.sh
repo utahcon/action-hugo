@@ -7,7 +7,48 @@ arg_pos=1
 
 while (( "$#" )); do
   if [[ -n $1 ]]; then
-    case $arg_pos in %%ENTRY%%
+    case $arg_pos in 
+      1) ARGUMENTS+="--baseURL ${1} ";;
+      2) ARGUMENTS+="--buildDrafts ${1} ";;
+      3) ARGUMENTS+="--buildExpired ${1} ";;
+      4) ARGUMENTS+="--buildFuture ${1} ";;
+      5) ARGUMENTS+="--cacheDir ${1} ";;
+      6) ARGUMENTS+="--cleanDestinationDir ${1} ";;
+      7) ARGUMENTS+="--clock ${1} ";;
+      8) ARGUMENTS+="--config ${1} ";;
+      9) ARGUMENTS+="--configDir ${1} ";;
+      10) ARGUMENTS+="--contentDir ${1} ";;
+      11) ARGUMENTS+="--destination ${1} ";;
+      12) ARGUMENTS+="--disableKinds ${1} ";;
+      13) ARGUMENTS+="--enableGitInfo ${1} ";;
+      14) ARGUMENTS+="--environment ${1} ";;
+      15) ARGUMENTS+="--forceSyncStatic ${1} ";;
+      16) ARGUMENTS+="--gc ${1} ";;
+      17) ARGUMENTS+="--help ${1} ";;
+      18) ARGUMENTS+="--ignoreCache ${1} ";;
+      19) ARGUMENTS+="--ignoreVendorPaths ${1} ";;
+      20) ARGUMENTS+="--layoutDir ${1} ";;
+      21) ARGUMENTS+="--logLevel ${1} ";;
+      22) ARGUMENTS+="--minify ${1} ";;
+      23) ARGUMENTS+="--noBuildLock ${1} ";;
+      24) ARGUMENTS+="--noChmod ${1} ";;
+      25) ARGUMENTS+="--noTimes ${1} ";;
+      26) ARGUMENTS+="--panicOnWarning ${1} ";;
+      27) ARGUMENTS+="--poll ${1} ";;
+      28) ARGUMENTS+="--printI18nWarnings ${1} ";;
+      29) ARGUMENTS+="--printMemoryUsage ${1} ";;
+      30) ARGUMENTS+="--printPathWarnings ${1} ";;
+      31) ARGUMENTS+="--printUnusedTemplates ${1} ";;
+      32) ARGUMENTS+="--quiet ${1} ";;
+      33) ARGUMENTS+="--renderSegments ${1} ";;
+      34) ARGUMENTS+="--renderToMemory ${1} ";;
+      35) ARGUMENTS+="--source ${1} ";;
+      36) ARGUMENTS+="--templateMetrics ${1} ";;
+      37) ARGUMENTS+="--templateMetricsHints ${1} ";;
+      38) ARGUMENTS+="--theme ${1} ";;
+      39) ARGUMENTS+="--themesDir ${1} ";;
+      40) ARGUMENTS+="--trace ${1} ";;
+      41) ARGUMENTS+="--watch ${1} ";;
     esac
   fi
   arg_pos=$((arg_pos+1))
